@@ -1,0 +1,17 @@
+﻿using E_PharmaHub.Dtos;
+using E_PharmaHub.Models;
+using E_PharmaHub.Models.Enums;
+
+namespace E_PharmaHub.Services
+{
+    public interface IDonorService
+    {
+        Task<IEnumerable<DonorReadDto>> GetAllDetailsAsync();
+        Task<IEnumerable<DonorReadDto>> GetByFilterAsync(BloodType? type, string? city);
+        Task<DonorProfile?> GetByUserIdAsync(string userId);
+        Task<DonorProfile> RegisterAsync(DonorRegisterDto donor);
+        Task<bool> UpdateAvailabilityAsync(string userId, bool isAvailable);
+        Task UpdateAsync(DonorProfile donor);
+        Task DeleteAsync(int id);
+    }
+}

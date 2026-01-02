@@ -1,0 +1,93 @@
+﻿using E_PharmaHub.Services.OrderServ;
+using E_PharmaHub.Services.PharmacistServ;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
+
+namespace E_PharmaHub.Controllers
+{
+    [Route("api/pharmacist/orders")]
+    [ApiController]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Pharmacist")]
+    public class PharmacistOrderController : ControllerBase
+    {
+        private readonly IOrderService _orderService;
+        private readonly IPharmacistService _pharmacistService;
+
+        public PharmacistOrderController(
+            IOrderService orderService,
+            IPharmacistService pharmacistService
+            )
+        {
+            _orderService = orderService;
+            _pharmacistService = pharmacistService;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetOrdersForMyPharmacy()
+        {
+            var pharmacistId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (pharmacistId == null)
+                return Unauthorized("Pharmacist not found.");
+
+            var pharmacist = await _pharmacistService.GetPharmacistProfileByUserIdAsync(pharmacistId);
+            if (pharmacist == null || pharmacist.PharmacyId == null)
+                return BadRequest("No pharmacy found for this pharmacist.");
+
+            var orders = await _orderService.GetOrdersByPharmacyIdAsync(pharmacist.PharmacyId);
+            if (orders == null || !orders.Any())
+                return NotFound("No orders found for this pharmacy.");
+
+            return Ok(orders);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetOrderById(int id)
+        {
+            var pharmacistId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var pharmacist = await _pharmacistService.GetPharmacistProfileByUserIdAsync(pharmacistId);
+
+            if (pharmacist == null || pharmacist.PharmacyId == null)
+                return BadRequest("No pharmacy found for this pharmacist.");
+
+            var order = await _orderService.GetOrderByIdAsync(id);
+            if (order == null || order.PharmacyId != pharmacist.PharmacyId)
+                return NotFound("Order not found or does not belong to your pharmacy.");
+
+            return Ok(order);
+        }
+
+        [HttpPut("{id}/accept")]
+        public async Task<IActionResult> AcceptOrder(int id)
+        {
+            var (success, message) = await _orderService.AcceptOrderAsync(id);
+            if (!success)
+                return BadRequest(message);
+
+            return Ok(message);
+        }
+
+        [HttpPut("{id}/cancel")]
+        public async Task<IActionResult> CancelOrder(int id)
+        {
+            var (success, message) = await _orderService.CancelOrderAsync(id);
+            if (!success)
+                return BadRequest(message);
+
+            return Ok(message);
+        }
+
+        [HttpPut("{id}/delivered")]
+        public async Task<IActionResult> MarkAsDelivered(int id)
+        {
+            var (success, message) = await _orderService.MarkAsDeliveredAsync(id);
+            if (!success)
+                return BadRequest(message);
+
+            return Ok(message);
+        }
+
+    }
+}
+
