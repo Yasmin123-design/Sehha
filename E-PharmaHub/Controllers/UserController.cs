@@ -225,11 +225,21 @@ namespace E_PharmaHub.Controllers
 
             await _userService.RevokeAllRefreshTokensAsync(userId);
 
-            Response.Cookies.Delete("auth_token");
-            Response.Cookies.Delete("refresh_token");
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,          // لازم نفس القيمة
+                SameSite = SameSiteMode.None,
+                Path = "/"
+                // Domain = "your-domain.com" ← لو كنتِ محدداها وقت الإنشاء
+            };
+
+            Response.Cookies.Delete("auth_token", cookieOptions);
+            Response.Cookies.Delete("refresh_token", cookieOptions);
 
             return Ok(new { message = "Logged out successfully ✅" });
         }
+
 
         [HttpPost("forgot-password")]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto model)
