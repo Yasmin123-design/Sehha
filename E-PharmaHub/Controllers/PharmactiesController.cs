@@ -213,6 +213,21 @@ namespace E_PharmaHub.Controllers
 
             return Ok(stats);
         }
+        [HttpGet("sales-by-category")]
+        [Authorize(
+       AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
+       Roles = "Pharmacist"
+   )]
+        public async Task<IActionResult> GetSalesByCategory()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var result = await _pharmacistDashboardService
+                .GetSalesByCategoryForPharmacistAsync(userId!);
+
+            return Ok(result);
+        }
+
     }
 
 }

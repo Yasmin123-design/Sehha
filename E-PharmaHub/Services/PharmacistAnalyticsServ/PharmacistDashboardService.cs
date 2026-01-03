@@ -119,6 +119,19 @@ namespace E_PharmaHub.Services.PharmacistAnalyticsServ
 
         };
         }
+        public async Task<List<SalesByCategoryDto>>
+    GetSalesByCategoryForPharmacistAsync(string userId)
+        {
+            var pharmacy = await _unitOfWork.Pharmacies
+                .GetBriefByPharmacistUserIdAsync(userId);
+
+            if (pharmacy == null)
+                throw new Exception("Pharmacy not found");
+
+            return await _unitOfWork.IinventoryItem
+                .GetSalesByCategoryAsync(pharmacy.Id);
+        }
+
         public async Task<DashboardStatsDto> GetDashboardStatsAsync(string userId)
         {
             var pharmacy = await _unitOfWork.Pharmacies

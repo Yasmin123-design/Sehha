@@ -1,6 +1,7 @@
 ﻿using E_PharmaHub.Dtos;
 using E_PharmaHub.Helpers;
 using E_PharmaHub.Models;
+using E_PharmaHub.Models.Enums;
 using E_PharmaHub.Repositories.MedicineRepo;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
@@ -33,6 +34,63 @@ namespace E_PharmaHub.Repositories.InventoryItemRepo
                 .CountAsync(i =>
                     i.PharmacyId == pharmacyId &&
                     i.Quantity > 0);
+        }
+
+        public async Task<List<SalesByCategoryDto>>
+    GetSalesByCategoryAsync(int pharmacyId)
+        {
+            var totalSales = await _context.OrderItems
+                .Where(oi =>
+                    oi.Order.PharmacyId == pharmacyId &&
+                    oi.Order.Status == OrderStatus.Confirmed)
+                .SumAsync(oi => oi.UnitPrice * oi.Quantity);
+
+            if (totalSales == 0)
+            {
+                return Enum.GetValues(typeof(MedicationCategory))
+                    .Cast<MedicationCategory>()
+                    .Select(c => new SalesByCategoryDto
+                    {
+                        Category = c,
+                        TotalSales = 0,
+                        Percentage = 0
+                    })
+                    .ToList();
+            }
+
+            var salesByCategory = await _context.OrderItems
+                .Where(oi =>
+                    oi.Order.PharmacyId == pharmacyId &&
+                    oi.Order.Status == OrderStatus.Confirmed)
+                .Include(oi => oi.Medication)
+                .GroupBy(oi => oi.Medication!.Category)
+                .Select(g => new
+                {
+                    Category = g.Key,
+                    TotalSales = g.Sum(x => x.UnitPrice * x.Quantity)
+                })
+                .ToListAsync();
+
+            var allCategories = Enum.GetValues(typeof(MedicationCategory))
+                .Cast<MedicationCategory>();
+
+            // الدمج النهائي
+            var result = allCategories.Select(category =>
+            {
+                var match = salesByCategory.FirstOrDefault(x => x.Category == category);
+                var sales = match?.TotalSales ?? 0;
+
+                return new SalesByCategoryDto
+                {
+                    Category = category,
+                    TotalSales = sales,
+                    Percentage = Math.Round(
+                        (double)(sales / totalSales) * 100,
+                        2)
+                };
+            }).ToList();
+
+            return result;
         }
 
         public async Task<int> CountOutOfStockAsync(int pharmacyId)
