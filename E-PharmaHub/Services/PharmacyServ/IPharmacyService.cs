@@ -5,6 +5,7 @@ namespace E_PharmaHub.Services.PharmacyServ
 {
     public interface IPharmacyService
     {
+        Task<PharmacySimpleDto> GetMyPharmaciesAsync(string userId);
         Task<IEnumerable<PharmacySimpleDto>> GetAllPharmaciesAsync();
         Task<PharmacySimpleDto> GetPharmacyByIdAsync(int id);
         Task AddPharmacyAsync(Pharmacy pharmacy, IFormFile imageFile);

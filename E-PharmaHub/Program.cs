@@ -84,6 +84,7 @@ namespace E_PharmaHub
                         .WithOrigins(
                             "http://127.0.0.1:5501",
                             "http://localhost:5501",
+                            "http://localhost:3000",
                             "https://unendingly-unfoul-emmy.ngrok-free.dev"
                         )
                         .AllowAnyHeader()

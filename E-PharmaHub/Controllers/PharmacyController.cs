@@ -43,6 +43,20 @@ namespace E_PharmaHub.Controllers
             return Ok(pharmacy);
         }
 
+        [HttpGet("GetPharmacyOfPharmacist")]
+        [Authorize(
+            AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
+            Roles = "Pharmacist"
+        )]
+        public async Task<IActionResult> GetPharmacyOfPharmacist()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var pharmacies = await _pharmacyService
+                .GetMyPharmaciesAsync(userId!);
+
+            return Ok(pharmacies);
+        }
         [HttpPost]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,Roles = "Admin")]
         public async Task<IActionResult> Add([FromForm] Pharmacy pharmacy, IFormFile image)

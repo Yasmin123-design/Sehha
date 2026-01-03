@@ -61,6 +61,7 @@ namespace E_PharmaHub.Repositories.PharmacyRepo
             _context.Pharmacies.Remove(entity);
         }
 
+       
         public async Task<IEnumerable<PharmacySimpleDto>> GetAllBriefAsync()
         {
             return await BasePharmacyIncludes()
@@ -68,6 +69,18 @@ namespace E_PharmaHub.Repositories.PharmacyRepo
                 .Select(PharmacySelectors.PharmacySimpleDtoSelector)
                 .ToListAsync();
         }
+        public async Task<PharmacySimpleDto> GetBriefByPharmacistUserIdAsync(string userId)
+        {
+            return await BasePharmacyIncludes()
+                .Where(p =>
+                    _context.Pharmacists.Any(ph =>
+                        ph.PharmacyId == p.Id &&
+                        ph.AppUserId == userId &&
+                        ph.IsApproved))
+                .Select(PharmacySelectors.PharmacySimpleDtoSelector)
+                .FirstOrDefaultAsync();
+        }
+
         public async Task<IEnumerable<PharmacySimpleDto>> GetNearestPharmaciesWithMedicationAsync(
     string medicationName, double userLat, double userLng)
         {

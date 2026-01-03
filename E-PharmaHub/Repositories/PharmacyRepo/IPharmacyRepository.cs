@@ -5,6 +5,8 @@ namespace E_PharmaHub.Repositories.PharmacyRepo
 {
     public interface IPharmacyRepository : IGenericRepository<Pharmacy>
     {
+        Task<PharmacySimpleDto> GetBriefByPharmacistUserIdAsync(string userId);
+
         Task<IEnumerable<PharmacySimpleDto>> GetAllBriefAsync();
         Task<PharmacySimpleDto> GetByIdBriefAsync(int id);
         Task<Pharmacy?> GetPharmacyByPharmacistUserIdAsync(string userId);
