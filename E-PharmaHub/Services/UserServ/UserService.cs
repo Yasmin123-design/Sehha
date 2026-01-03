@@ -112,6 +112,15 @@ namespace E_PharmaHub.Services.UserServ
             if (user == null)
                 return (false, "User not found.");
 
+            if (!string.IsNullOrWhiteSpace(dto.UserName))
+            {
+                if (dto.UserName.Contains(" "))
+                    return (false, "Username must not contain spaces ❌");
+
+                user.UserName = dto.UserName;
+                user.NormalizedUserName = dto.UserName.ToUpper();
+            }
+
             if (!string.IsNullOrEmpty(dto.Email) && dto.Email != user.Email)
             {
                 var emailResult = await _userManager.SetEmailAsync(user, dto.Email);
@@ -123,12 +132,6 @@ namespace E_PharmaHub.Services.UserServ
                     return (false, "Failed to update username ❌");
             }
 
-            if (!string.IsNullOrEmpty(dto.UserName))
-            {
-                user.UserName = dto.UserName;
-                user.NormalizedUserName = dto.UserName.ToUpper();
-            }
-
             if (!string.IsNullOrEmpty(dto.PhoneNumber))
                 user.PhoneNumber = dto.PhoneNumber;
 
@@ -137,8 +140,10 @@ namespace E_PharmaHub.Services.UserServ
 
             _userRepo.Update(user);
             await _unitOfWork.CompleteAsync();
+
             return (true, "Profile updated successfully ✅");
         }
+
 
 
 
