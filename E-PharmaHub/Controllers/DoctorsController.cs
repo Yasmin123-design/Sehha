@@ -274,6 +274,19 @@ namespace E_PharmaHub.Controllers
 
             return Ok(result);
         }
+        [HttpGet("GetClinicOfDoctor")]
+        [Authorize(
+    AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
+    Roles = "Doctor"
+)]
+        public async Task<IActionResult> GetClinicOfDoctor()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var clinic = await _clinicService.GetMyClinicsAsync(userId!);
+
+            return Ok(clinic);
+        }
 
     }
 }

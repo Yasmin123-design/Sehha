@@ -111,7 +111,11 @@ namespace E_PharmaHub.Services.ClinicServ
             return (true, "Clinic updated successfully ✅");
         }
 
-
+        public async Task<ClinicDto> GetMyClinicsAsync(string userId)
+        {
+            return await _unitOfWork.Clinics
+                .GetBriefByDoctorUserIdAsync(userId);
+        }
         public async Task<bool> DeleteClinicAsync(int id)
         {
             var clinic = await _unitOfWork.Clinics.GetByIdAsync(id);

@@ -5,6 +5,7 @@ namespace E_PharmaHub.Repositories.ClinicRepo
 {
     public interface IClinicRepository : IGenericRepository<Clinic>
     {
+        Task<ClinicDto> GetBriefByDoctorUserIdAsync(string userId);
         Task<IEnumerable<ClinicDto>> GetAllDtoAsync();
         Task<ClinicDto?> GetDtoByIdAsync(int id);
         Task<Clinic?> GetClinicByDoctorUserIdAsync(string userId);

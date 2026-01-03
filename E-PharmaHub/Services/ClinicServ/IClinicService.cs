@@ -5,6 +5,7 @@ namespace E_PharmaHub.Services.ClinicServ
 {
     public interface IClinicService
     {
+        Task<ClinicDto> GetMyClinicsAsync(string userId);
         Task<Clinic> CreateClinicAsync(Clinic clinic);
         Task<Clinic?> GetClinicByIdAsync(int id);
         Task<IEnumerable<Clinic>> GetAllClinicsAsync();

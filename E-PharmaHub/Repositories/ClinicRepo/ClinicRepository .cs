@@ -59,7 +59,17 @@ namespace E_PharmaHub.Repositories.ClinicRepo
                 .Select(d => d.Clinic)
                 .FirstOrDefaultAsync();
         }
-
+        public async Task<ClinicDto> GetBriefByDoctorUserIdAsync(string userId)
+        {
+            return await BaseClinicIncludes()
+                .Where(c =>
+                    _context.DoctorProfiles.Any(d =>
+                        d.ClinicId == c.Id &&
+                        d.AppUserId == userId &&
+                        d.IsApproved))
+                .Select(ClinicSelectors.ClinicDtoSelector)
+                .FirstOrDefaultAsync();
+        }
         public async Task AddAsync(Clinic entity)
         {
             await _context.Clinics.AddAsync(entity);
