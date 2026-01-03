@@ -197,6 +197,31 @@ namespace E_PharmaHub.Repositories.OrderRepo
                 .Select(Selector)
                 .FirstAsync();
         }
+        public async Task<int> CountOrdersByDateAsync(int pharmacyId, DateTime date)
+        {
+            return await _context.Orders
+                .CountAsync(o =>
+                    o.PharmacyId == pharmacyId &&
+                    o.CreatedAt.Date == date.Date);
+        }
+
+        public async Task<decimal> GetRevenueByDateAsync(int pharmacyId, DateTime date)
+        {
+            return await _context.Orders
+                .Where(o =>
+                    o.PharmacyId == pharmacyId &&
+                    o.CreatedAt.Date == date.Date &&
+                    o.Status == OrderStatus.Confirmed)
+                .SumAsync(o => o.TotalPrice);
+        }
+
+        public async Task<int> CountPendingOrdersAsync(int pharmacyId)
+        {
+            return await _context.Orders
+                .CountAsync(o =>
+                    o.PharmacyId == pharmacyId &&
+                    o.Status == OrderStatus.Pending);
+        }
 
         public async Task<Order?> GetOrderByIdAsync(int orderId)
         {

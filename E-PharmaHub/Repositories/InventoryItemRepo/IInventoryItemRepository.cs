@@ -6,7 +6,8 @@ namespace E_PharmaHub.Repositories.InventoryItemRepo
 {
     public interface IInventoryItemRepository
     {
-
+        Task<int> CountAvailableStockAsync(int pharmacyId);
+        Task<int> CountOutOfStockAsync(int pharmacyId);
         Task<List<CategoryItemsCountDto>> GetItemsCountByCategoryAsync(
     int pharmacyId,
     DateTime from,

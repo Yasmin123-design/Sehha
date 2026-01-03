@@ -202,6 +202,17 @@ namespace E_PharmaHub.Controllers
             }
         }
 
+        [HttpGet("my-stats")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Pharmacist")]
+        public async Task<IActionResult> GetMyDashboard()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var stats = await _pharmacistDashboardService
+                .GetDashboardStatsAsync(userId!);
+
+            return Ok(stats);
+        }
     }
 
 }

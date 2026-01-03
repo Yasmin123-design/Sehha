@@ -4,7 +4,6 @@ using E_PharmaHub.Models.Enums;
 using E_PharmaHub.Services.NotificationServ;
 using E_PharmaHub.Services.StripePaymentServ;
 using E_PharmaHub.UnitOfWorkes;
-using Microsoft.EntityFrameworkCore;
 using Stripe;
 
 namespace E_PharmaHub.Services.OrderServ

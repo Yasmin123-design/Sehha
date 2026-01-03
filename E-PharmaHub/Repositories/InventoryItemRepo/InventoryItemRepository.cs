@@ -27,6 +27,22 @@ namespace E_PharmaHub.Repositories.InventoryItemRepo
                 .Include(i => i.Pharmacy)
                     .ThenInclude(p => p.Address);
         }
+        public async Task<int> CountAvailableStockAsync(int pharmacyId)
+        {
+            return await _context.InventoryItems
+                .CountAsync(i =>
+                    i.PharmacyId == pharmacyId &&
+                    i.Quantity > 0);
+        }
+
+        public async Task<int> CountOutOfStockAsync(int pharmacyId)
+        {
+            return await _context.InventoryItems
+                .CountAsync(i =>
+                    i.PharmacyId == pharmacyId &&
+                    i.Quantity == 0);
+        }
+
 
         public async Task<InventoryItem?> GetByPharmacyAndMedicationWithoutIncludesAsync(int pharmacyId, int medicationId)
         {

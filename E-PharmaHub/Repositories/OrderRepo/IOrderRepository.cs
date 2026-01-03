@@ -10,7 +10,9 @@ namespace E_PharmaHub.Repositories.OrderRepo
     int pharmacyId,
     DateTime from,
     DateTime to);
-
+        Task<int> CountOrdersByDateAsync(int pharmacyId, DateTime date);
+        Task<decimal> GetRevenueByDateAsync(int pharmacyId, DateTime date);
+        Task<int> CountPendingOrdersAsync(int pharmacyId);
 
         Task<int> CountByStatusAsync(
             int pharmacyId,

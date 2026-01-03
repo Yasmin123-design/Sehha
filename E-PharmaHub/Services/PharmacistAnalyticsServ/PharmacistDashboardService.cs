@@ -119,7 +119,41 @@ namespace E_PharmaHub.Services.PharmacistAnalyticsServ
 
         };
         }
+        public async Task<DashboardStatsDto> GetDashboardStatsAsync(string userId)
+        {
+            var pharmacy = await _unitOfWork.Pharmacies
+                .GetPharmacyByPharmacistUserIdAsync(userId);
 
+            if (pharmacy.Id == null)
+                throw new Exception("Pharmacy not found for this pharmacist");
+
+            var today = DateTime.UtcNow.Date;
+            var yesterday = today.AddDays(-1);
+
+            return new DashboardStatsDto
+            {
+                TodayOrders =
+                    await _unitOfWork.Order.CountOrdersByDateAsync(pharmacy.Id, today),
+
+                YesterdayOrders =
+                    await _unitOfWork.Order.CountOrdersByDateAsync(pharmacy.Id, yesterday),
+
+                TodayRevenue =
+                    await _unitOfWork.Order.GetRevenueByDateAsync(pharmacy.Id, today),
+
+                YesterdayRevenue =
+                    await _unitOfWork.Order.GetRevenueByDateAsync(pharmacy.Id, yesterday),
+
+                PendingOrders =
+                    await _unitOfWork.Order.CountPendingOrdersAsync(pharmacy.Id),
+
+                AvailableStock =
+                    await _unitOfWork.IinventoryItem.CountAvailableStockAsync(pharmacy.Id),
+
+                OutOfStock =
+                    await _unitOfWork.IinventoryItem.CountOutOfStockAsync(pharmacy.Id)
+            };
+        }
         public async Task<InventoryDashboardDto> GetInventoryDashboardAsync(string userId)
         {
             var pharmacist =
@@ -136,6 +170,8 @@ namespace E_PharmaHub.Services.PharmacistAnalyticsServ
                 TotalProducts = await _inventoryItemRepository.GetTotalProductsAsync(pharmacyId)
             };
         }
+
+        
     }
 
 }
