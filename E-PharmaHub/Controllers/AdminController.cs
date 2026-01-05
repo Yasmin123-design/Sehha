@@ -1,7 +1,9 @@
 ﻿using E_PharmaHub.Dtos;
+using E_PharmaHub.Services.AppointmentServ;
 using E_PharmaHub.Services.ClinicServ;
 using E_PharmaHub.Services.DoctorServ;
 using E_PharmaHub.Services.MedicineServ;
+using E_PharmaHub.Services.OrderServ;
 using E_PharmaHub.Services.PharmacistServ;
 using E_PharmaHub.Services.PharmacyServ;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -21,12 +23,16 @@ namespace E_PharmaHub.Controllers
         private readonly IPharmacyService _pharmacyService;
         private readonly IClinicService _clinicService;
         private readonly IMedicineService _medicineService;
+        private readonly IAppointmentService _appointmentService;
+        private readonly IOrderService _orderService;
         public AdminController(
             IDoctorService doctorService,
             IPharmacistService pharmacistService,
             IPharmacyService pharmacyService,
             IClinicService clinicService,
-            IMedicineService medicineService
+            IMedicineService medicineService,
+            IAppointmentService appointmentService,
+            IOrderService orderService
             )
         {
             _doctorService = doctorService;
@@ -34,6 +40,8 @@ namespace E_PharmaHub.Controllers
             _pharmacyService = pharmacyService;
             _clinicService = clinicService;
             _medicineService = medicineService;
+            _appointmentService = appointmentService;
+            _orderService = orderService;
         }
         [HttpGet("allDoctorsShowToAdmin")]
         public async Task<IActionResult> GetAllDoctorsShowToAdmin()
@@ -223,7 +231,128 @@ namespace E_PharmaHub.Controllers
             return Ok(items);
         }
 
+        [HttpPost("addmedicinetopharmacy/{pharmacyId}")]
+        public async Task<IActionResult> Add([FromForm] MedicineDto dto, IFormFile? image,int pharmacyId)
+        {
+           
+            var result = await _medicineService.AddMedicineWithInventoryAsync(dto, image,pharmacyId);
 
+            if (!result.Success)
+                return BadRequest(new { message = result.Message });
+
+            return Ok(new { message = result.Message });
+        }
+
+        [HttpPut("updatemedicine/{id}/{pharmacyId}")]
+        public async Task<IActionResult> Update(int id, [FromForm] MedicineDto dto, IFormFile? image, int pharmacyId)
+        {
+           
+                await _medicineService.UpdateMedicineAsync(id, dto, image, pharmacyId);
+            return Ok(new { message = "Medicine updated successfully." });
+        }
+
+        [HttpDelete("deletemedicine/{id}/{pharmacyId}")]
+        public async Task<IActionResult> Delete(int id,int pharmacyId)
+        {
+           
+            await _medicineService.DeleteMedicineAsync(id, pharmacyId);
+            return Ok(new { message = "Medicine deleted successfully." });
+        }
+
+        [HttpGet("doctorappointments/{userId}")]
+        public async Task<IActionResult> GetByDoctor(string userId)
+
+        {
+            var appointments = await _appointmentService.GetAppointmentsByDoctorAsync(userId);
+            if (!appointments.Any())
+                return NotFound(new { message = "No appointments found for this doctor." });
+
+            return Ok(appointments);
+        }
+
+        [HttpPatch("completeappointment/{id}")]
+        public async Task<IActionResult> CompleteAppointment(int id)
+        {
+            var result = await _appointmentService.CompleteAppointmentAsync(id);
+            if (!result) return NotFound(new { message = "Appointment not found" });
+
+            return Ok(new { message = $"Appointment status updated to Completed" });
+        }
+
+        [HttpPut("approveappointment/{appointmentId}/{userId}")]
+        public async Task<IActionResult> ApproveAppointment(int appointmentId,string userId)
+        {
+            var (success, message) = await _appointmentService.ApproveAppointmentAsync(appointmentId, userId);
+            if (!success)
+                return BadRequest(new { message });
+
+            return Ok(new { message });
+        }
+
+        [HttpPut("rejectappointment/{appointmentId}")]
+        public async Task<IActionResult> RejectAppointment(int appointmentId)
+        {
+            var (success, message) = await _appointmentService.RejectAppointmentAsync(appointmentId);
+            if (!success)
+                return BadRequest(new { message });
+
+            return Ok(new { message });
+        }
+
+        [HttpGet("getordersforpharmacy/{pharmacistId}")]
+        public async Task<IActionResult> GetOrdersForMyPharmacy(string pharmacistId)
+        {
+
+            var pharmacist = await _pharmacistService.GetPharmacistProfileByUserIdAsync(pharmacistId);
+            if (pharmacist == null || pharmacist.PharmacyId == null)
+                return BadRequest("No pharmacy found for this pharmacist.");
+
+            var orders = await _orderService.GetOrdersByPharmacyIdAsync(pharmacist.PharmacyId);
+            if (orders == null || !orders.Any())
+                return NotFound("No orders found for this pharmacy.");
+
+            return Ok(orders);
+        }
+
+        [HttpGet("getorder/{id}")]
+        public async Task<IActionResult> GetOrderById(int id)
+        {
+            var order = await _orderService.GetOrderByIdAsync(id);
+            if (order == null )
+                return NotFound("Order not found or does not belong to your pharmacy.");
+
+            return Ok(order);
+        }
+
+        [HttpPut("{id}/acceptorder")]
+        public async Task<IActionResult> AcceptOrder(int id)
+        {
+            var (success, message) = await _orderService.AcceptOrderAsync(id);
+            if (!success)
+                return BadRequest(message);
+
+            return Ok(message);
+        }
+
+        [HttpPut("{id}/cancelorder")]
+        public async Task<IActionResult> CancelOrder(int id)
+        {
+            var (success, message) = await _orderService.CancelOrderAsync(id);
+            if (!success)
+                return BadRequest(message);
+
+            return Ok(message);
+        }
+
+        [HttpPut("{id}/deliveredorder")]
+        public async Task<IActionResult> MarkAsDelivered(int id)
+        {
+            var (success, message) = await _orderService.MarkAsDeliveredAsync(id);
+            if (!success)
+                return BadRequest(message);
+
+            return Ok(message);
+        }
     }
 
 }
