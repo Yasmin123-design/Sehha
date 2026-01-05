@@ -15,7 +15,8 @@ namespace E_PharmaHub.Helpers
                 Address = user.Address,
                 Latitude = user.Latitude,
                 Longitude = user.Longitude,
-                ProfileImage = user.ProfileImage
+                ProfileImage = user.ProfileImage,
+                PhoneNumber = user.PhoneNumber
             };
         }
     }
