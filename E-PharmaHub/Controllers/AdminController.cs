@@ -1,6 +1,7 @@
 ﻿using E_PharmaHub.Dtos;
 using E_PharmaHub.Services.ClinicServ;
 using E_PharmaHub.Services.DoctorServ;
+using E_PharmaHub.Services.MedicineServ;
 using E_PharmaHub.Services.PharmacistServ;
 using E_PharmaHub.Services.PharmacyServ;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -19,17 +20,20 @@ namespace E_PharmaHub.Controllers
         private readonly IPharmacistService _pharmacistService;
         private readonly IPharmacyService _pharmacyService;
         private readonly IClinicService _clinicService;
+        private readonly IMedicineService _medicineService;
         public AdminController(
             IDoctorService doctorService,
             IPharmacistService pharmacistService,
             IPharmacyService pharmacyService,
-            IClinicService clinicService
+            IClinicService clinicService,
+            IMedicineService medicineService
             )
         {
             _doctorService = doctorService;
             _pharmacistService = pharmacistService;
             _pharmacyService = pharmacyService;
             _clinicService = clinicService;
+            _medicineService = medicineService;
         }
         [HttpGet("allDoctorsShowToAdmin")]
         public async Task<IActionResult> GetAllDoctorsShowToAdmin()
@@ -202,6 +206,30 @@ namespace E_PharmaHub.Controllers
             var clinic = await _clinicService.GetMyClinicsAsync(userId!);
 
             return Ok(clinic);
+        }
+        [HttpGet("pharmacy/{userId}")]
+        [Authorize(
+  AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme
+)]
+        public async Task<IActionResult> GetByPharmacy(string userId)
+        {
+
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized("Invalid token");
+
+            var pharmacyId = await _pharmacistService
+                .GetPharmacyIdByUserIdAsync(userId);
+
+            if (pharmacyId == null)
+                return NotFound("Pharmacy not found for this pharmacist");
+
+            var items = await _medicineService
+                .GetMedicinesByPharmacyIdAsync(pharmacyId.Value);
+
+            if (!items.Any())
+                return NotFound("No medicines found for this pharmacy");
+
+            return Ok(items);
         }
     }
 

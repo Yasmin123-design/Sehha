@@ -13,8 +13,10 @@ namespace E_PharmaHub.Helpers
             {
                 Id = p.Id,
                 Email = p.AppUser.Email,
+                UserId = p.AppUser.Id,
                 LicenseNumber = p.LicenseNumber,
                 IsApproved = p.IsApproved,
+                PharmacyId = p.Pharmacy.Id,
                 PharmacyName = p.Pharmacy?.Name,
                 PharmacyPhone = p.Pharmacy?.Phone,
                 PharmacyImagePath = p.Pharmacy?.ImagePath,
