@@ -6,6 +6,7 @@ using E_PharmaHub.Services.MedicineServ;
 using E_PharmaHub.Services.OrderServ;
 using E_PharmaHub.Services.PharmacistServ;
 using E_PharmaHub.Services.PharmacyServ;
+using E_PharmaHub.Services.UserServ;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -25,6 +26,7 @@ namespace E_PharmaHub.Controllers
         private readonly IMedicineService _medicineService;
         private readonly IAppointmentService _appointmentService;
         private readonly IOrderService _orderService;
+        private readonly IUserService _userService;
         public AdminController(
             IDoctorService doctorService,
             IPharmacistService pharmacistService,
@@ -32,7 +34,8 @@ namespace E_PharmaHub.Controllers
             IClinicService clinicService,
             IMedicineService medicineService,
             IAppointmentService appointmentService,
-            IOrderService orderService
+            IOrderService orderService,
+            IUserService userService
             )
         {
             _doctorService = doctorService;
@@ -42,6 +45,7 @@ namespace E_PharmaHub.Controllers
             _medicineService = medicineService;
             _appointmentService = appointmentService;
             _orderService = orderService;
+            _userService = userService;
         }
         [HttpGet("allDoctorsShowToAdmin")]
         public async Task<IActionResult> GetAllDoctorsShowToAdmin()
@@ -352,6 +356,23 @@ namespace E_PharmaHub.Controllers
                 return BadRequest(message);
 
             return Ok(message);
+        }
+        [HttpGet("getallregularusers")]
+        public async Task<IActionResult> GetRegularUsers()
+        {
+            var users = await _userService.GetRegularUsersAsync();
+            return Ok(users);
+        }
+
+        [HttpPost("change-password-for-regularuser")]
+        public async Task<IActionResult> ChangePassword(ChangeUserPasswordDto dto)
+        {
+            var result = await _userService.ChangeUserPasswordAsync(dto.UserId, dto.NewPassword);
+
+            if (!result)
+                return BadRequest("Failed to change password");
+
+            return Ok("Password changed successfully");
         }
     }
 

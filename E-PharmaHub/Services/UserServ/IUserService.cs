@@ -7,6 +7,9 @@ namespace E_PharmaHub.Services.UserServ
     {
         Task RevokeAllRefreshTokensAsync(string userId);
         Task SaveRefreshTokenAsync(string userId, string refreshToken);
+        Task<List<RegularUserDto>> GetRegularUsersAsync();
+        Task<bool> ChangeUserPasswordAsync(string userId, string newPassword);
+
         Task<RefreshToken?> RotateRefreshTokenAsync(string oldRefreshToken);
         Task<(bool Success, string Message)> UpdatePasswordAsync(string userId, UserPasswordUpdateDto dto);
         Task<UpdateLocationResult> UpdateUserLocationAsync(

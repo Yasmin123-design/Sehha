@@ -33,8 +33,41 @@ namespace E_PharmaHub.Services.UserServ
             _userManager = userManager;
             _fileStorage = fileStorage;
         }
+        public async Task<List<RegularUserDto>> GetRegularUsersAsync()
+        {
+            var users = _userManager.Users.ToList();
+            var result = new List<RegularUserDto>();
 
-        public async Task SaveRefreshTokenAsync(string userId, string refreshToken)
+            foreach (var user in users)
+            {
+                var roles = await _userManager.GetRolesAsync(user);
+
+                if (roles.Contains("RegularUser")) 
+                {
+                    result.Add(new RegularUserDto
+                    {
+                        Id = user.Id,
+                        UserName = user.UserName,
+                        Email = user.Email
+                    });
+                }
+            }
+
+            return result;
+        }
+        public async Task<bool> ChangeUserPasswordAsync(string userId, string newPassword)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                return false;
+
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var result = await _userManager.ResetPasswordAsync(user, token, newPassword);
+
+            return result.Succeeded;
+        }
+
+    public async Task SaveRefreshTokenAsync(string userId, string refreshToken)
         {
             var refreshTokenEntity = new RefreshToken
             {
