@@ -82,16 +82,20 @@ namespace E_PharmaHub.Repositories.OrderRepo
                 .Include(o => o.Payment)
                 .Include(o => o.Items)
                     .ThenInclude(i => i.Medication)
-                .AsNoTracking();
+                .AsNoTracking()
+                    .OrderByDescending(o => o.CreatedAt);
+
         }
-        
+
 
         public async Task<int> GetPendingOrdersAsync(int pharmacyId)
         {
             return await _context.Orders
+                .OrderByDescending(o => o.CreatedAt)
                 .CountAsync(o =>
                     o.PharmacyId == pharmacyId &&
                     o.Status == OrderStatus.Pending);
+
         }
 
         public async Task<int> GetConfirmedOrdersAsync(int pharmacyId)
