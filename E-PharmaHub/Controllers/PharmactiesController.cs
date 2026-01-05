@@ -157,6 +157,8 @@ namespace E_PharmaHub.Controllers
             return Ok(stats);
         }
         [HttpGet("GetAnalyticsStats")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Pharmacist")]
+
         public async Task<IActionResult> GetDashboard()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
