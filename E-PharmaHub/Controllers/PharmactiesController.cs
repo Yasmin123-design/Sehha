@@ -97,63 +97,6 @@ namespace E_PharmaHub.Controllers
             return Ok(new { message });
         }
 
-        [HttpGet("all")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
-        public async Task<IActionResult> GetAllPharmacists()
-        {
-            var pharmacists = await _pharmacistService.GetAllPharmacistsAsync();
-            return Ok(pharmacists);
-        }
-
-        [HttpGet("{id}")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
-        public async Task<IActionResult> GetPharmacistById(int id)
-        {
-            var pharmacist = await _pharmacistService.GetPharmacistByIdAsync(id);
-            if (pharmacist == null)
-                return NotFound(new { message = "Pharmacist not found." });
-
-            return Ok(pharmacist);
-        }
-
-
-        [HttpDelete("{id}")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
-        public async Task<IActionResult> DeletePharmacist(int id)
-        {
-            try
-            {
-                await _pharmacistService.DeletePharmacistAsync(id);
-                return Ok(new { message = "Pharmacist deleted successfully." });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { error = ex.Message });
-            }
-        }
-
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
-        [HttpPut("approve/{id}")]
-        public async Task<IActionResult> ApprovePharmacist(int id)
-        {
-            var (success, message) = await _pharmacistService.ApprovePharmacistAsync(id);
-            if (!success)
-                return BadRequest(new { message });
-
-            return Ok(new { message });
-        }
-
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
-        [HttpPut("reject/{id}")]
-        public async Task<IActionResult> RejectPharmacist(int id)
-        {
-            var (success, message) = await _pharmacistService.RejectPharmacistAsync(id);
-            if (!success)
-                return BadRequest(new { message });
-
-            return Ok(new { message });
-        }
-
         [Authorize(
     AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
     Roles = "Pharmacist")]
@@ -286,12 +229,20 @@ namespace E_PharmaHub.Controllers
             return Ok(result);
         }
         [HttpGet("inventoryreport-last-30-days")]
+        [Authorize(
+    AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
+    Roles = "Pharmacist"
+)]
         public async Task<IActionResult> GetLast30DaysInventory()
         {
             var report = await _pharmacistDashboardService.GetLast30DaysInventoryReportAsync();
             return Ok(report);
         }
         [HttpGet("out-of-stock/last-30-days")]
+        [Authorize(
+    AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
+    Roles = "Pharmacist"
+)]
         public async Task<IActionResult> GetOutOfStockLast30Days()
         {
             var result = await _pharmacistDashboardService.GetOutOfStockLast30DaysAsync();

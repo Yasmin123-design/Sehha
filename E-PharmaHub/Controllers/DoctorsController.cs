@@ -98,55 +98,6 @@ namespace E_PharmaHub.Controllers
             return Ok(doctor);
         }
 
-        [HttpGet("allDoctorsShowToAdmin")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
-
-        public async Task<IActionResult> GetAllDoctorsShowToAdmin()
-        {
-            var doctor = await _doctorService.GetAllDoctorsShowToAdmin();
-            if (doctor == null)
-                return NotFound(new { message = "Doctor not found." });
-
-            return Ok(doctor);
-        }
-
-        [HttpDelete("{id}")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
-        public async Task<IActionResult> DeleteDoctorWithClinicWithAddressRelated(int id)
-        {
-            try
-            {
-                await _doctorService.DeleteDoctorAsync(id);
-                return Ok(new { message = "Doctor deleted successfully." });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { error = ex.Message });
-            }
-        }
-
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
-        [HttpPut("approve/{id}")]
-        public async Task<IActionResult> ApproveDoctor(int id)
-        {
-            var (success, message) = await _doctorService.ApproveDoctorAsync(id);
-            if (!success)
-                return BadRequest(new { message });
-
-            return Ok(new { message });
-        }
-
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
-        [HttpPut("reject/{id}")]
-        public async Task<IActionResult> RejectDoctor(int id)
-        {
-            var (success, message) = await _doctorService.RejectDoctorAsync(id);
-            if (!success)
-                return BadRequest(new { message });
-
-            return Ok(new { message });
-        }
-
 
         [HttpGet("filterDoctors")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "RegularUser")]
