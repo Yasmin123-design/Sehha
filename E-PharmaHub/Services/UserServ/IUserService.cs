@@ -5,6 +5,7 @@ namespace E_PharmaHub.Services.UserServ
 {
     public interface IUserService
     {
+        Task<bool> DeleteUserAsync(string userId);
         Task RevokeAllRefreshTokensAsync(string userId);
         Task SaveRefreshTokenAsync(string userId, string refreshToken);
         Task<List<RegularUserDto>> GetRegularUsersAsync();

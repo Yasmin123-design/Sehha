@@ -374,6 +374,16 @@ namespace E_PharmaHub.Controllers
 
             return Ok("Password changed successfully");
         }
+        [HttpDelete("deleteuser/{userId}")]
+        public async Task<IActionResult> DeleteUser(string userId)
+        {
+            var success = await _userService.DeleteUserAsync(userId);
+
+            if (!success)
+                return NotFound("User not found");
+
+            return Ok("User deleted successfully");
+        }
     }
 
 }
