@@ -1,4 +1,5 @@
 ﻿using E_PharmaHub.Dtos;
+using E_PharmaHub.Helpers;
 using E_PharmaHub.Models;
 using E_PharmaHub.Repositories.UserRepo;
 using E_PharmaHub.Services.FileStorageServ;
@@ -42,19 +43,15 @@ namespace E_PharmaHub.Services.UserServ
             {
                 var roles = await _userManager.GetRolesAsync(user);
 
-                if (roles.Contains("RegularUser")) 
+                if (roles.Contains("RegularUser"))
                 {
-                    result.Add(new RegularUserDto
-                    {
-                        Id = user.Id,
-                        UserName = user.UserName,
-                        Email = user.Email
-                    });
+                    result.Add(user.ToRegularUserDto());
                 }
             }
 
             return result;
         }
+
         public async Task<bool> ChangeUserPasswordAsync(string userId, string newPassword)
         {
             var user = await _userManager.FindByIdAsync(userId);
