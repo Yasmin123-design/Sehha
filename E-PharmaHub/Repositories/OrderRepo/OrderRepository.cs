@@ -175,6 +175,93 @@ namespace E_PharmaHub.Repositories.OrderRepo
                 .Select(Selector)
                 .FirstOrDefaultAsync();
         }
+        public async Task<List<DailyRevenueDto>>
+    GetDailyRevenueAsync(int pharmacyId, int year, int? month)
+        {
+            var ordersQuery = _context.Orders
+                .Where(o =>
+    o.PharmacyId == pharmacyId &&
+    (o.Status == OrderStatus.Confirmed ||
+     o.Status == OrderStatus.Delivered) &&
+    o.CreatedAt.Year == year
+);
+
+
+            if (month.HasValue)
+                ordersQuery = ordersQuery
+                    .Where(o => o.CreatedAt.Month == month.Value);
+
+            var groupedOrders = await ordersQuery
+                .GroupBy(o => o.CreatedAt.Date)
+                .Select(g => new
+                {
+                    Date = g.Key,
+                    Revenue = g.Sum(x => x.TotalPrice)
+                })
+                .ToListAsync();
+
+            int daysCount = month.HasValue
+                ? DateTime.DaysInMonth(year, month.Value)
+                : DateTime.IsLeapYear(year) ? 366 : 365;
+
+            DateTime startDate = month.HasValue
+                ? new DateTime(year, month.Value, 1)
+                : new DateTime(year, 1, 1);
+
+            var result = new List<DailyRevenueDto>();
+
+            for (int i = 0; i < daysCount; i++)
+            {
+                var date = startDate.AddDays(i);
+
+                var revenueForDay = groupedOrders
+                    .FirstOrDefault(x => x.Date == date)?.Revenue ?? 0;
+
+                result.Add(new DailyRevenueDto
+                {
+                    Date = date.ToString("yyyy-MM-dd"),
+                    TotalRevenue = revenueForDay
+                });
+            }
+
+            return result;
+        }
+
+        public async Task<List<SalesByTimeSlotDto>>
+    GetTodaySalesByTimeSlotsAsync(int pharmacyId)
+        {
+            var today = DateTime.UtcNow.Date;
+
+            var orders = await _context.Orders
+                .Where(o =>
+    o.PharmacyId == pharmacyId &&
+    (o.Status == OrderStatus.Confirmed || o.Status == OrderStatus.Delivered) &&
+    o.CreatedAt.Date == today
+    ).Select(o => o.CreatedAt.Hour)
+                .ToListAsync();
+
+            var slots = new List<SalesByTimeSlotDto>
+    {
+        new() { TimeSlot = "00:00 - 03:00" },
+        new() { TimeSlot = "03:00 - 06:00" },
+        new() { TimeSlot = "06:00 - 09:00" },
+        new() { TimeSlot = "09:00 - 12:00" },
+        new() { TimeSlot = "12:00 - 15:00" },
+        new() { TimeSlot = "15:00 - 18:00" },
+        new() { TimeSlot = "18:00 - 21:00" },
+        new() { TimeSlot = "21:00 - 24:00" }
+    };
+
+            foreach (var hour in orders)
+            {
+                int index = hour / 3;  
+                if (index < 8)
+                    slots[index].SalesCount++;
+            }
+
+            return slots;
+        }
+
         public async Task UpdateAsync(Order order)
         {
             _context.Orders.Update(order);

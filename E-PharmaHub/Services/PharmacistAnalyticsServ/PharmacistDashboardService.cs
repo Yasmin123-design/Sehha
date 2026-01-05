@@ -21,6 +21,57 @@ namespace E_PharmaHub.Services.PharmacistAnalyticsServ
             _inventoryItemRepository = inventoryItemRepository;
             _pharmacistService = pharmacistService;
         }
+        public async Task<List<DailyRevenueDto>>
+    GetDailyRevenueAsync(string userId, int? year, int? month)
+        {
+            int resolvedYear = year ?? DateTime.UtcNow.Year;
+
+            var pharmacist =
+                await _pharmacistService.GetPharmacistProfileByUserIdAsync(userId);
+
+            if (pharmacist?.PharmacyId == null)
+                throw new Exception("Pharmacist has no pharmacy");
+
+            return await _unitOfWork.Order
+                .GetDailyRevenueAsync(
+                    pharmacist.PharmacyId,
+                    resolvedYear,
+                    month
+                );
+        }
+        public async Task<List<SalesByTimeSlotDto>>
+    GetTodaySalesByTimeSlotsAsync(string userId)
+        {
+            var pharmacist =
+                await _pharmacistService.GetPharmacistProfileByUserIdAsync(userId);
+
+            if (pharmacist?.PharmacyId == null)
+                throw new Exception("Pharmacist has no pharmacy");
+
+            return await _unitOfWork.Order
+                .GetTodaySalesByTimeSlotsAsync(pharmacist.PharmacyId);
+        }
+
+        public async Task<List<DailyOutOfStockDto>> GetOutOfStockLast30DaysAsync()
+        {
+            return await _unitOfWork.IinventoryItem.GetOutOfStockLast30DaysAsync();
+        }
+        public async Task<List<DailyInventoryDto>> GetLast30DaysInventoryReportAsync()
+        {
+            return await _unitOfWork.IinventoryItem.GetLast30DaysInventoryAsync();
+        }
+        public async Task<List<BestSellingMedicationDto>>
+    GetBestSellingMedicationsAsync(string userId)
+        {
+            var pharmacist =
+                await _pharmacistService.GetPharmacistProfileByUserIdAsync(userId);
+
+            if (pharmacist?.PharmacyId == null)
+                throw new Exception("Pharmacist has no pharmacy");
+
+            return await _unitOfWork.OrderItems
+                .GetTopSellingMedicationsAsync(pharmacist.PharmacyId);
+        }
 
         public async Task<WeeklyOrdersDashboardDto> GetWeeklyOrdersAsync(string userId)
         {

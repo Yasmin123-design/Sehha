@@ -228,6 +228,75 @@ namespace E_PharmaHub.Controllers
             return Ok(result);
         }
 
+        [HttpGet("best-selling")]
+        [Authorize(
+    AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
+    Roles = "Pharmacist"
+)]
+        public async Task<IActionResult> GetBestSelling()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+                return Unauthorized();
+
+            var result =
+                await _pharmacistDashboardService.GetBestSellingMedicationsAsync(userId);
+
+            return Ok(result);
+        }
+        [HttpGet("daily-revenue")]
+        [Authorize(
+     AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
+     Roles = "Pharmacist"
+ )]
+        public async Task<IActionResult> GetDailyRevenue(
+     [FromQuery] int? year,
+     [FromQuery] int? month)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+                return Unauthorized();
+
+            if (year.HasValue && (year < 1 || year > 9999))
+                return BadRequest("Year must be between 1 and 9999");
+
+            if (month.HasValue && (month < 1 || month > 12))
+                return BadRequest("Month must be between 1 and 12");
+
+            var result =
+                await _pharmacistDashboardService
+                    .GetDailyRevenueAsync(userId, year, month);
+
+            return Ok(result);
+        }
+        [HttpGet("today-sales-by-time")]
+        [Authorize(
+    AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
+    Roles = "Pharmacist"
+)]
+        public async Task<IActionResult> GetTodaySalesByTime()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+                return Unauthorized();
+
+            var result =
+                await _pharmacistDashboardService.GetTodaySalesByTimeSlotsAsync(userId);
+
+            return Ok(result);
+        }
+        [HttpGet("inventoryreport-last-30-days")]
+        public async Task<IActionResult> GetLast30DaysInventory()
+        {
+            var report = await _pharmacistDashboardService.GetLast30DaysInventoryReportAsync();
+            return Ok(report);
+        }
+        [HttpGet("out-of-stock/last-30-days")]
+        public async Task<IActionResult> GetOutOfStockLast30Days()
+        {
+            var result = await _pharmacistDashboardService.GetOutOfStockLast30DaysAsync();
+            return Ok(result);
+        }
     }
 
 }

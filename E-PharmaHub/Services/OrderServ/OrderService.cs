@@ -2,6 +2,7 @@
 using E_PharmaHub.Models;
 using E_PharmaHub.Models.Enums;
 using E_PharmaHub.Services.NotificationServ;
+using E_PharmaHub.Services.PharmacistServ;
 using E_PharmaHub.Services.StripePaymentServ;
 using E_PharmaHub.UnitOfWorkes;
 using Stripe;
@@ -13,13 +14,22 @@ namespace E_PharmaHub.Services.OrderServ
         private readonly IUnitOfWork _unitOfWork;
         private readonly IConfiguration _config;
         private readonly INotificationService _notificationService;
-        public OrderService(IUnitOfWork unitOfWork,IConfiguration config,INotificationService notificationService)
+        private readonly IPharmacistService _pharmacistService;
+        public OrderService(
+            IUnitOfWork unitOfWork,
+            IConfiguration config,
+            INotificationService notificationService,
+            IPharmacistService pharmacistService
+            )
         {
             _unitOfWork = unitOfWork;
             _notificationService = notificationService;
             _config = config;
+            _pharmacistService = pharmacistService;
 
         }
+
+
         public async Task<CartResult> CheckoutAsync(string userId, CheckoutDto dto)
         {
             var cart = await _unitOfWork.Carts.GetUserCartAsync(userId, asNoTracking: true);

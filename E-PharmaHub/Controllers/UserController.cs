@@ -152,7 +152,7 @@ namespace E_PharmaHub.Controllers
                 HttpOnly = true,         
                 Secure = true,            
                 SameSite = SameSiteMode.None,  // Lax for HTTP (development)
-                Path = "/",                   // Explicit path
+                Path = "/",                   
                 Expires = DateTimeOffset.UtcNow.AddMinutes(30)
             });
 
@@ -160,8 +160,8 @@ namespace E_PharmaHub.Controllers
             {
                 HttpOnly = true,
                 Secure = true,
-                SameSite = SameSiteMode.None,  // Lax for HTTP (development)
-                Path = "/",                   // Explicit path
+                SameSite = SameSiteMode.None, 
+                Path = "/",                   
                 Expires = DateTimeOffset.UtcNow.AddDays(7) 
             });
             return Ok(new
@@ -199,16 +199,16 @@ namespace E_PharmaHub.Controllers
             {
                 HttpOnly = true,
                 Secure = true,
-                SameSite = SameSiteMode.None,  // Lax for HTTP (development)
-                Path = "/",                   // Explicit path
+                SameSite = SameSiteMode.None,
+                Path = "/",                  
                 Expires = DateTimeOffset.UtcNow.AddMinutes(30)
             });
             Response.Cookies.Append("refresh_token", newRefreshToken, new CookieOptions
             {
                 HttpOnly = true,
                 Secure = true,
-                SameSite = SameSiteMode.None,  // Lax for HTTP (development)
-                Path = "/",                   // Explicit path
+                SameSite = SameSiteMode.None,
+                Path = "/",                  
                 Expires = DateTimeOffset.UtcNow.AddDays(7) 
             });
 
@@ -228,10 +228,9 @@ namespace E_PharmaHub.Controllers
             var cookieOptions = new CookieOptions
             {
                 HttpOnly = true,
-                Secure = true,          // لازم نفس القيمة
+                Secure = true,         
                 SameSite = SameSiteMode.None,
                 Path = "/"
-                // Domain = "your-domain.com" ← لو كنتِ محدداها وقت الإنشاء
             };
 
             Response.Cookies.Delete("auth_token", cookieOptions);
@@ -289,7 +288,7 @@ namespace E_PharmaHub.Controllers
                 issuer: _config["Jwt:Issuer"],
                 audience: _config["Jwt:Audience"],
                 claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(3),
+                expires: DateTime.UtcNow.AddMinutes(30),
                 signingCredentials: creds
             );
 

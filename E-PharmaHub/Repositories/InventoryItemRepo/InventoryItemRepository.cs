@@ -18,6 +18,35 @@ namespace E_PharmaHub.Repositories.InventoryItemRepo
             _context = context;
             _medicineRepository = medicineRepository;
         }
+        public async Task<List<DailyInventoryDto>> GetLast30DaysInventoryAsync()
+        {
+            var today = DateTime.UtcNow.Date;
+            var startDate = today.AddDays(-29);
+
+            var dbData = await _context.InventoryItems
+                .Where(i => i.CreatedAt.Date >= startDate && i.CreatedAt.Date <= today)
+                .GroupBy(i => i.CreatedAt.Date)
+                .Select(g => new
+                {
+                    Date = g.Key,
+                    Quantity = g.Sum(i => i.Quantity)
+                })
+                .ToListAsync();
+
+            var allDates = Enumerable.Range(0, 30)
+                .Select(offset => startDate.AddDays(offset))
+                .ToList();
+
+            var result = allDates.Select(date => new DailyInventoryDto
+            {
+                Date = date.ToString("yyyy-MM-dd"),
+                Quantity = dbData.FirstOrDefault(d => d.Date == date)?.Quantity ?? 0
+            })
+            .ToList();
+
+            return result;
+        }
+
 
         private IQueryable<InventoryItem> BaseInventoryIncludes()
         {
@@ -28,6 +57,7 @@ namespace E_PharmaHub.Repositories.InventoryItemRepo
                 .Include(i => i.Pharmacy)
                     .ThenInclude(p => p.Address);
         }
+
         public async Task<int> CountAvailableStockAsync(int pharmacyId)
         {
             return await _context.InventoryItems
@@ -74,7 +104,6 @@ namespace E_PharmaHub.Repositories.InventoryItemRepo
             var allCategories = Enum.GetValues(typeof(MedicationCategory))
                 .Cast<MedicationCategory>();
 
-            // الدمج النهائي
             var result = allCategories.Select(category =>
             {
                 var match = salesByCategory.FirstOrDefault(x => x.Category == category);
@@ -266,5 +295,41 @@ namespace E_PharmaHub.Repositories.InventoryItemRepo
                 })
                 .ToListAsync();
         }
+        public async Task<List<DailyOutOfStockDto>> GetOutOfStockLast30DaysAsync()
+        {
+            var today = DateTime.UtcNow.Date;
+            var startDate = today.AddDays(-29);
+
+            var zeroStockItems = await _context.InventoryItems
+                .Where(i =>
+                    i.Quantity == 0 &&
+                    i.LastUpdated.Date >= startDate &&
+                    i.LastUpdated.Date <= today
+                )
+                .GroupBy(i => i.LastUpdated.Date)
+                .Select(g => new
+                {
+                    Date = g.Key,
+                    Count = g.Count()
+                })
+                .ToListAsync();
+
+            var result = Enumerable.Range(0, 30)
+                .Select(i =>
+                {
+                    var date = startDate.AddDays(i);
+                    var dayData = zeroStockItems.FirstOrDefault(x => x.Date == date);
+
+                    return new DailyOutOfStockDto
+                    {
+                        Date = date.ToString("yyyy-MM-dd"),
+                        Count = dayData?.Count ?? 0
+                    };
+                })
+                .ToList();
+
+            return result;
+        }
+
     }
 }

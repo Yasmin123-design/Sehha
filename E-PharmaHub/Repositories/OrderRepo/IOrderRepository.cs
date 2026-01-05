@@ -6,10 +6,9 @@ namespace E_PharmaHub.Repositories.OrderRepo
 {
     public interface IOrderRepository
     {
-        Task<int> CountAsync(
-    int pharmacyId,
-    DateTime from,
-    DateTime to);
+        Task<List<SalesByTimeSlotDto>> GetTodaySalesByTimeSlotsAsync(int pharmacyId);
+        Task<List<DailyRevenueDto>> GetDailyRevenueAsync(int pharmacyId, int year, int? month);
+        Task<int> CountAsync(int pharmacyId,DateTime from,DateTime to);
         Task<int> CountOrdersByDateAsync(int pharmacyId, DateTime date);
         Task<decimal> GetRevenueByDateAsync(int pharmacyId, DateTime date);
         Task<int> CountPendingOrdersAsync(int pharmacyId);

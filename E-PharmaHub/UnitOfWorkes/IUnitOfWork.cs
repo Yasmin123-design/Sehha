@@ -13,6 +13,7 @@ using E_PharmaHub.Repositories.InventoryItemRepo;
 using E_PharmaHub.Repositories.MedicineRepo;
 using E_PharmaHub.Repositories.MessageThreadRepo;
 using E_PharmaHub.Repositories.NotificationRepo;
+using E_PharmaHub.Repositories.OrderItemRepo;
 using E_PharmaHub.Repositories.OrderRepo;
 using E_PharmaHub.Repositories.PaymentRepo;
 using E_PharmaHub.Repositories.PharmacistRepo;
@@ -49,6 +50,8 @@ namespace E_PharmaHub.UnitOfWorkes
 
         IBloodRequestRepository BloodRequest { get; }
         IAddressRepository Addresses { get; }
+        IOrderItemRepository OrderItems { get; }
+
         IDonorMatchRepository donorMatches { get; }
         INotificationRepository Notifications { get; }
         ICartItemRepository CartItemRepository { get; }
