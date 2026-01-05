@@ -6,6 +6,9 @@ namespace E_PharmaHub.Repositories.OrderRepo
 {
     public interface IOrderRepository
     {
+        Task<int> GetTotalOrdersAsync(int pharmacyId);
+        Task<decimal> GetTotalRevenueAsync(int pharmacyId);
+        Task<int> GetTotalCustomersAsync(int pharmacyId);
         Task<List<SalesByTimeSlotDto>> GetTodaySalesByTimeSlotsAsync(int pharmacyId);
         Task<List<DailyRevenueDto>> GetDailyRevenueAsync(int pharmacyId, int year, int? month);
         Task<int> CountAsync(int pharmacyId,DateTime from,DateTime to);

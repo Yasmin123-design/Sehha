@@ -16,7 +16,7 @@ namespace E_PharmaHub.Helpers
                 UserId = p.AppUser.Id,
                 LicenseNumber = p.LicenseNumber,
                 IsApproved = p.IsApproved,
-                PharmacyId = p.Pharmacy.Id,
+                PharmacyId = p.Pharmacy?.Id,
                 PharmacyName = p.Pharmacy?.Name,
                 PharmacyPhone = p.Pharmacy?.Phone,
                 PharmacyImagePath = p.Pharmacy?.ImagePath,

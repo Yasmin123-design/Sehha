@@ -4,6 +4,8 @@ namespace E_PharmaHub.Services.PharmacistAnalyticsServ
 {
     public interface IPharmacistDashboardService
     {
+        Task<GetAnalyticsStats> GetDashboardAsync(int pharmacyId);
+
         Task<List<DailyOutOfStockDto>> GetOutOfStockLast30DaysAsync();
         Task<List<DailyInventoryDto>> GetLast30DaysInventoryReportAsync();
         Task<List<SalesByTimeSlotDto>> GetTodaySalesByTimeSlotsAsync(string userId);

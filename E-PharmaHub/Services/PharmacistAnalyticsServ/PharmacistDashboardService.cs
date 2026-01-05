@@ -97,6 +97,16 @@ namespace E_PharmaHub.Services.PharmacistAnalyticsServ
                 LastWeek = await BuildSummary(pharmacyId, lastWeekFrom, lastWeekTo)
             };
         }
+        public async Task<GetAnalyticsStats> GetDashboardAsync(int pharmacyId)
+        {
+            return new GetAnalyticsStats
+            {
+                TotalOrders = await _unitOfWork.Order.GetTotalOrdersAsync(pharmacyId),
+                TotalRevenue = await _unitOfWork.Order.GetTotalRevenueAsync(pharmacyId),
+                TotalCustomers = await _unitOfWork.Order.GetTotalCustomersAsync(pharmacyId),
+                TotalProducts = await _unitOfWork.IinventoryItem.GetTotalProductsAsync(pharmacyId)
+            };
+        }
         public async Task<WeeklyCategoryItemsDto> GetWeeklyCategoryItemsAsync(string userId)
         {
             var pharmacist =

@@ -6,6 +6,7 @@ namespace E_PharmaHub.Repositories.InventoryItemRepo
 {
     public interface IInventoryItemRepository
     {
+        Task<int> GetTotalProductsAsync(int pharmacyId);
         Task<List<DailyOutOfStockDto>> GetOutOfStockLast30DaysAsync();
         Task<List<DailyInventoryDto>> GetLast30DaysInventoryAsync();
         Task<List<SalesByCategoryDto>> GetSalesByCategoryAsync(int pharmacyId);
@@ -15,7 +16,6 @@ namespace E_PharmaHub.Repositories.InventoryItemRepo
     int pharmacyId,
     DateTime from,
     DateTime to);
-        Task<int> GetTotalProductsAsync(int pharmacyId);
         Task<int> GetLowStockCountAsync(int pharmacyId, int threshold = 5);
         Task<int> GetOutOfStockCountAsync(int pharmacyId);
         Task<InventoryItem> GetInventoryForCheckoutAsync(int medicationId, int pharmacyId, decimal price);

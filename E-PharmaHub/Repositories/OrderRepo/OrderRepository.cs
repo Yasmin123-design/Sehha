@@ -15,7 +15,33 @@ namespace E_PharmaHub.Repositories.OrderRepo
         {
             _context = context;
         }
+        public async Task<int> GetTotalOrdersAsync(int pharmacyId)
+        {
+            return await _context.Orders
+                .Where(o =>
+                    o.PharmacyId == pharmacyId)
+                .CountAsync();
+        }
 
+        public async Task<decimal> GetTotalRevenueAsync(int pharmacyId)
+        {
+            return await _context.Orders
+                .Where(o =>
+                o.PharmacyId == pharmacyId &&
+                (o.Status == OrderStatus.Confirmed
+                         || o.Status == OrderStatus.Delivered))
+                .SumAsync(o => o.TotalPrice);
+        }
+        public async Task<int> GetTotalCustomersAsync(int pharmacyId)
+{
+    return await _context.Orders
+        .Where(o =>
+            o.PharmacyId == pharmacyId)
+        .Select(o => o.UserId)
+        .Distinct()
+        .CountAsync();
+}
+     
         public async Task AddAsync(Order order)
         {
             await _context.Orders.AddAsync(order);
@@ -58,11 +84,7 @@ namespace E_PharmaHub.Repositories.OrderRepo
                     .ThenInclude(i => i.Medication)
                 .AsNoTracking();
         }
-        public async Task<int> GetTotalOrdersAsync(int pharmacyId)
-        {
-            return await _context.Orders
-                .CountAsync(o => o.PharmacyId == pharmacyId);
-        }
+        
 
         public async Task<int> GetPendingOrdersAsync(int pharmacyId)
         {

@@ -207,30 +207,23 @@ namespace E_PharmaHub.Controllers
 
             return Ok(clinic);
         }
-        [HttpGet("pharmacy/{userId}")]
-        [Authorize(
-  AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme
-)]
-        public async Task<IActionResult> GetByPharmacy(string userId)
+        [HttpGet("pharmacy/{pharmacyId}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> GetByPharmacy(int pharmacyId)
         {
-
-            if (string.IsNullOrEmpty(userId))
-                return Unauthorized("Invalid token");
-
-            var pharmacyId = await _pharmacistService
-                .GetPharmacyIdByUserIdAsync(userId);
-
             if (pharmacyId == null)
                 return NotFound("Pharmacy not found for this pharmacist");
 
             var items = await _medicineService
-                .GetMedicinesByPharmacyIdAsync(pharmacyId.Value);
+                .GetMedicinesByPharmacyIdAsync(pharmacyId);
 
             if (!items.Any())
                 return NotFound("No medicines found for this pharmacy");
 
             return Ok(items);
         }
+
+
     }
 
 }

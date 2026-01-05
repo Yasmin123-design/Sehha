@@ -18,6 +18,13 @@ namespace E_PharmaHub.Repositories.InventoryItemRepo
             _context = context;
             _medicineRepository = medicineRepository;
         }
+        public async Task<int> GetTotalProductsAsync(int pharmacyId)
+        {
+            return await _context.InventoryItems
+                .Where(i => i.PharmacyId == pharmacyId && i.Quantity > 0)
+                .CountAsync();
+        }
+
         public async Task<List<DailyInventoryDto>> GetLast30DaysInventoryAsync()
         {
             var today = DateTime.UtcNow.Date;
@@ -138,12 +145,7 @@ namespace E_PharmaHub.Repositories.InventoryItemRepo
                 .FirstOrDefaultAsync(x => x.PharmacyId == pharmacyId && x.MedicationId == medicationId);
         }
 
-        public async Task<int> GetTotalProductsAsync(int pharmacyId)
-        {
-            return await _context.InventoryItems
-                .CountAsync(p => p.PharmacyId == pharmacyId);
-        }
-
+        
         public async Task<int> GetLowStockCountAsync(int pharmacyId, int threshold = 5)
         {
             return await _context.InventoryItems

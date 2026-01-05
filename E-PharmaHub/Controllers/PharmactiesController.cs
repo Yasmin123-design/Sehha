@@ -156,6 +156,18 @@ namespace E_PharmaHub.Controllers
 
             return Ok(stats);
         }
+        [HttpGet("GetAnalyticsStats")]
+        public async Task<IActionResult> GetDashboard()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var pharmacist =
+               await _pharmacistService.GetPharmacistProfileByUserIdAsync(userId);
+
+            var dashboard = 
+                await _pharmacistDashboardService.GetDashboardAsync(pharmacist.PharmacyId);
+            return Ok(dashboard);
+        }
         [HttpGet("sales-by-category")]
         [Authorize(
        AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
