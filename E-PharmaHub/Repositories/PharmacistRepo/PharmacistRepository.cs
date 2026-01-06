@@ -30,7 +30,10 @@ namespace E_PharmaHub.Repositories.PharmacistRepo
 
         public async Task<PharmacistProfile> GetByIdAsync(int id)
         {
-            return await BasePharmacistIncludes()
+            return await _context.Pharmacists
+                .Include(p => p.AppUser)
+                .Include(p => p.Pharmacy)
+                .ThenInclude(ph => ph.Address)
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
 
