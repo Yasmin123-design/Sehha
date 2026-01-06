@@ -28,22 +28,27 @@ namespace E_PharmaHub.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromForm] PharmacistRegisterDto dto, IFormFile? pharmacyImage , IFormFile? pharmacistImage)
+        public async Task<IActionResult> Register(
+    [FromForm] PharmacistRegisterDto dto,
+    IFormFile? pharmacyImage,
+    IFormFile? pharmacistImage)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             try
             {
-                var user = await _pharmacistService.RegisterPharmacistAsync(dto, pharmacyImage,pharmacistImage);
+                var response = await _pharmacistService.RegisterPharmacistAsync(
+                    dto,
+                    pharmacyImage,
+                    pharmacistImage);
 
                 return Ok(new
                 {
                     message = "Pharmacist registered successfully! Awaiting admin approval.",
-                    name = user.UserName,
-                    userId = user.Id,
-                    email = user.Email,
-                    role = user.Role.ToString()
+                    name = response.UserName,
+                    email = response.Email,
+                    pharmacistProfileId = response.PharmacistProfileId
                 });
             }
             catch (Exception ex)
@@ -51,6 +56,7 @@ namespace E_PharmaHub.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Pharmacist")]
         [HttpPut("update-profile")]
