@@ -80,9 +80,15 @@ namespace E_PharmaHub.Repositories.DoctorRepo
         public async Task<IEnumerable<DoctorReadDto>> GetAllDoctorsShowToAdminAsync()
         {
             return await BaseDoctorIncludes()
+
+                .Where(d => _context.Payments
+                    .Any(p => p.ReferenceId == d.AppUserId &&
+                              p.PaymentIntentId != null ))
+
                 .Select(Selector)
                 .ToListAsync();
         }
+
 
         public async Task<IEnumerable<DoctorReadDto>> GetAllDoctorsAcceptedByAdminAsync()
         {

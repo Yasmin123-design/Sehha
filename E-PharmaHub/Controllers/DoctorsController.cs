@@ -33,30 +33,26 @@ namespace E_PharmaHub.Controllers
     User.FindFirstValue(ClaimTypes.NameIdentifier);
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromForm] DoctorRegisterDto dto,
-            IFormFile? clinicImage,
-            IFormFile doctorImage
-            )
+        public async Task<IActionResult> RegisterDoctor(
+       [FromForm] DoctorRegisterDto dto,
+       IFormFile clinicImage,
+       IFormFile doctorImage)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
             try
             {
-                var user = await _doctorService.RegisterDoctorAsync(dto, clinicImage,doctorImage);
+                var response = await _doctorService.RegisterDoctorAsync(
+                    dto,
+                    clinicImage,
+                    doctorImage);
 
-                return Ok(new
-                {
-                    message = "Doctor registered successfully! Awaiting admin approval.",
-                    userId = user.Id,
-                    email = user.Email,
-                    name = user.UserName,
-                    role = user.Role.ToString()
-                });
+                return Ok(response);
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new
+                {
+                    message = ex.Message
+                });
             }
         }
 

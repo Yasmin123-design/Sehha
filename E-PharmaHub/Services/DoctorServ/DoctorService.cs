@@ -85,18 +85,28 @@ namespace E_PharmaHub.Services.DoctorServ
         {
             return await _unitOfWork.Doctors.GetDoctorByUserIdReadDtoAsync(userId);
         }
-        public async Task<AppUser> RegisterDoctorAsync(DoctorRegisterDto dto, IFormFile clinicImage, IFormFile doctorImage)
+
+        public async Task<DoctorRegisterResponseDto> RegisterDoctorAsync(
+            DoctorRegisterDto dto,
+            IFormFile clinicImage,
+            IFormFile doctorImage)
         {
             var existingUser = await _userManager.FindByEmailAsync(dto.Email);
             if (existingUser != null)
                 throw new Exception("This email is already registered. Please use another one.");
-            string generatedUsername = dto.UserName + "_" + Guid.NewGuid().ToString("N").Substring(0, 6);
+
+            string generatedUsername = dto.UserName + "_" +
+                Guid.NewGuid().ToString("N").Substring(0, 6);
+            string doctorImagePath = null;
+            if (doctorImage != null)
+                doctorImagePath = await _fileStorage.SaveFileAsync(doctorImage, "doctors");
 
             var user = new AppUser
             {
                 UserName = generatedUsername,
                 Email = dto.Email,
-                Role = UserRole.Doctor
+                Role = UserRole.Doctor,
+                ProfileImage = doctorImagePath
             };
 
             var result = await _userManager.CreateAsync(user, dto.Password);
@@ -105,29 +115,22 @@ namespace E_PharmaHub.Services.DoctorServ
 
             await _userManager.AddToRoleAsync(user, UserRole.Doctor.ToString());
 
-            
+            var address = new Address
+            {
+                Country = dto.ClinicAddress.Country,
+                City = dto.ClinicAddress.City,
+                Street = dto.ClinicAddress.Street,
+                PostalCode = dto.ClinicAddress.PostalCode,
+                Latitude = dto.ClinicAddress.Latitude,
+                Longitude = dto.ClinicAddress.Longitude
+            };
 
-            Address address;
-            
-            
-                address = new Address
-                {
-                    Country = dto.ClinicAddress.Country,
-                    City = dto.ClinicAddress.City,
-                    Street = dto.ClinicAddress.Street,
-                    PostalCode = dto.ClinicAddress.PostalCode,
-                    Latitude = dto.ClinicAddress.Latitude,
-                    Longitude = dto.ClinicAddress.Longitude
-                };
-                await _unitOfWork.Addresses.AddAsync(address);
-                await _unitOfWork.CompleteAsync();
-            
+            await _unitOfWork.Addresses.AddAsync(address);
+            await _unitOfWork.CompleteAsync();
 
             string clinicImagePath = null;
             if (clinicImage != null)
-            {
                 clinicImagePath = await _fileStorage.SaveFileAsync(clinicImage, "clinics");
-            }
 
             var clinic = new Clinic
             {
@@ -140,10 +143,7 @@ namespace E_PharmaHub.Services.DoctorServ
             await _unitOfWork.Clinics.AddAsync(clinic);
             await _unitOfWork.CompleteAsync();
 
-            string doctorImagePath = null;
-            if (doctorImage != null)
-                doctorImagePath = await _fileStorage.SaveFileAsync(doctorImage, "doctors");
-
+          
             var doctorProfile = new DoctorProfile
             {
                 AppUserId = user.Id,
@@ -154,13 +154,18 @@ namespace E_PharmaHub.Services.DoctorServ
                 Gender = dto.Gender,
                 IsApproved = false,
                 HasPaid = false
-
             };
 
             await _unitOfWork.Doctors.AddAsync(doctorProfile);
             await _unitOfWork.CompleteAsync();
 
-            return user;
+            return new DoctorRegisterResponseDto
+            {
+                UserName = user.UserName,
+                Email = user.Email,
+                DoctorProfileId = doctorProfile.Id,
+                ConsultationPrice = doctorProfile.ConsultationPrice
+            };
         }
 
         public async Task<(bool success, string message)> ApproveDoctorAsync(int doctorId)

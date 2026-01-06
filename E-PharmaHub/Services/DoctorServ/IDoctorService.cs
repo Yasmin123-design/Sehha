@@ -6,7 +6,10 @@ namespace E_PharmaHub.Services.DoctorServ
 {
     public interface IDoctorService
     {
-        Task<AppUser> RegisterDoctorAsync(DoctorRegisterDto dto, IFormFile clinicImage, IFormFile doctorImage);
+        Task<DoctorRegisterResponseDto> RegisterDoctorAsync(
+               DoctorRegisterDto dto,
+               IFormFile clinicImage,
+               IFormFile doctorImage);
         Task<DoctorReadDto?> GetDoctorByUserIdAsync(string userId);
         Task<DoctorProfile?> GetDoctorDetailsByUserIdAsync(string userId);
 
