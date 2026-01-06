@@ -163,6 +163,7 @@ namespace E_PharmaHub.Services.DoctorServ
             {
                 UserName = user.UserName,
                 Email = user.Email,
+                UserId = user.Id,
                 DoctorProfileId = doctorProfile.Id,
                 ConsultationPrice = doctorProfile.ConsultationPrice
             };
