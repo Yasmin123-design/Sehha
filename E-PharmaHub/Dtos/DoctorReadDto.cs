@@ -12,6 +12,7 @@ namespace E_PharmaHub.Dtos
         public Gender Gender { get; set; }
         public double AverageRating { get; set; }
         public string Username { get; set; }
+        public string UserId { get; set; }
         public decimal ConsultationPrice { get; set; }
         public ConsultationType ConsultationType { get; set; }
         public int ClinicId { get; set; }
