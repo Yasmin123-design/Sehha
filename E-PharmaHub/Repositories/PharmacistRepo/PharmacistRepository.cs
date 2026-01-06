@@ -59,7 +59,11 @@ namespace E_PharmaHub.Repositories.PharmacistRepo
 
         public async Task<IEnumerable<PharmacistReadDto>> GetAllDetailsAsync()
         {
-            var pharmacists = await BasePharmacistIncludes().ToListAsync();
+            var pharmacists = await BasePharmacistIncludes()
+                .Where(d => _context.Payments
+                    .Any(p => p.ReferenceId == d.AppUserId &&
+                              p.PaymentIntentId != null))
+                .ToListAsync();
             return pharmacists.Select(PharmacistSelector.MapToDto).ToList();
         }
 
