@@ -8,6 +8,7 @@
         public string? PharmacistImage { get; set; }
         public string LicenseNumber { get; set; }
         public bool IsApproved { get; set; }
+        public bool IsReject { get; set; }
         public int? PharmacyId { get; set; }
         public string PharmacyName { get; set; }
         public string PharmacyPhone { get; set; }
