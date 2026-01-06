@@ -10,7 +10,6 @@ using E_PharmaHub.Services.UserServ;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace E_PharmaHub.Controllers
 {

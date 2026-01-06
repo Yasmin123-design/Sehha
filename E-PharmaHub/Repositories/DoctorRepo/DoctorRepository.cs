@@ -88,8 +88,6 @@ namespace E_PharmaHub.Repositories.DoctorRepo
                 .Select(Selector)
                 .ToListAsync();
         }
-
-
         public async Task<IEnumerable<DoctorReadDto>> GetAllDoctorsAcceptedByAdminAsync()
         {
             return await BaseDoctorIncludes()

@@ -17,6 +17,7 @@ namespace E_PharmaHub.Helpers
                 Email = d.AppUser.Email,
                 Specialty = d.Specialty,
                 IsApproved = d.IsApproved,
+                IsRejected = d.IsRejected,
                 ClinicName = d.Clinic.Name,
                 ClinicPhone = d.Clinic.Phone,
                 ClinicImagePath = d.Clinic.ImagePath,
