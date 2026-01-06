@@ -8,6 +8,7 @@ using E_PharmaHub.Services.StripePaymentServ;
 using E_PharmaHub.UnitOfWorkes;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Routing.Matching;
+using Microsoft.EntityFrameworkCore;
 using Address = E_PharmaHub.Models.Address;
 
 namespace E_PharmaHub.Services.PharmacistServ
@@ -39,19 +40,32 @@ namespace E_PharmaHub.Services.PharmacistServ
             _emailSender = emailSender;
         }
 
-        public async Task<AppUser> RegisterPharmacistAsync(PharmacistRegisterDto dto, IFormFile pharmacyImage, IFormFile pharmacistImage)
+        public async Task<PharmacistRegisterResponseDto> RegisterPharmacistAsync(
+       PharmacistRegisterDto dto,
+       IFormFile pharmacyImage,
+       IFormFile pharmacistImage)
         {
             var existingUser = await _userManager.FindByEmailAsync(dto.Email);
             if (existingUser != null)
-                throw new Exception("This email is already registered. Please use another one.");
+                throw new Exception("This email is already registered.");
 
-            string generatedUsername = dto.UserName + "_" + Guid.NewGuid().ToString("N").Substring(0, 6);
+            string generatedUsername = dto.UserName + "_" +
+                Guid.NewGuid().ToString("N").Substring(0, 6);
+
+            string? pharmacyImagePath = null;
+            if (pharmacyImage != null && pharmacyImage.Length > 0)
+                pharmacyImagePath = await _fileStorage.SaveFileAsync(pharmacyImage, "pharmacies");
+
+            string? pharmacistImagePath = null;
+            if (pharmacistImage != null && pharmacistImage.Length > 0)
+                pharmacistImagePath = await _fileStorage.SaveFileAsync(pharmacistImage, "pharmacists");
 
             var user = new AppUser
             {
                 UserName = generatedUsername,
                 Email = dto.Email,
                 Role = UserRole.Pharmacist,
+                ProfileImage = pharmacistImagePath
             };
 
             var result = await _userManager.CreateAsync(user, dto.Password);
@@ -85,14 +99,9 @@ namespace E_PharmaHub.Services.PharmacistServ
                     Latitude = dto.Address.Latitude,
                     Longitude = dto.Address.Longitude
                 };
+
                 await _unitOfWork.Addresses.AddAsync(address);
                 await _unitOfWork.CompleteAsync();
-            }
-
-            string? pharmacyImagePath = null;
-            if (pharmacyImage != null && pharmacyImage.Length > 0)
-            {
-                pharmacyImagePath = await _fileStorage.SaveFileAsync(pharmacyImage, "pharmacies");
             }
 
             var pharmacy = new Pharmacy
@@ -102,30 +111,31 @@ namespace E_PharmaHub.Services.PharmacistServ
                 AddressId = address.Id,
                 ImagePath = pharmacyImagePath
             };
+
             await _unitOfWork.Pharmacies.AddAsync(pharmacy);
             await _unitOfWork.CompleteAsync();
 
-            string? pharmacistImagePath = null;
-            if (pharmacistImage != null && pharmacistImage.Length > 0)
-            {
-                pharmacistImagePath = await _fileStorage.SaveFileAsync(pharmacistImage, "pharmacistes");
-            }
+       
+
             var pharmacistProfile = new PharmacistProfile
             {
                 AppUserId = user.Id,
                 PharmacyId = pharmacy.Id,
                 LicenseNumber = dto.LicenseNumber,
-                IsApproved = false,
-                HasPaid = false
-
+                IsApproved = false
             };
-            user.ProfileImage = pharmacistImagePath;
-            _unitOfWork.Useres.Update(user);
+
             await _unitOfWork.PharmasistsProfile.AddAsync(pharmacistProfile);
             await _unitOfWork.CompleteAsync();
 
+            
 
-            return user;
+            return new PharmacistRegisterResponseDto
+            {
+                UserName = user.UserName,
+                Email = user.Email,
+                PharmacistProfileId = pharmacistProfile.Id
+            };
         }
 
         public async Task AddPharmacistAsync(PharmacistProfile pharmacist)
