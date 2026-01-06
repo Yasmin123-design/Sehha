@@ -245,13 +245,36 @@ namespace E_PharmaHub.Services.PharmacistServ
             if (user == null)
                 return false;
 
+            bool userUpdated = false;
+
             if (!string.IsNullOrEmpty(dto.Email))
+            {
                 user.Email = dto.Email;
+                userUpdated = true;
+            }
 
             if (!string.IsNullOrEmpty(dto.UserName))
+            {
                 user.UserName = dto.UserName;
+                userUpdated = true;
+            }
 
-            await _userManager.UpdateAsync(user);
+            if (image != null)
+            {
+                var imagePath = await _fileStorage.SaveFileAsync(image, "pharmacistes");
+                user.ProfileImage = imagePath;
+                userUpdated = true;
+            }
+
+            if (userUpdated)
+            {
+                var updateResult = await _userManager.UpdateAsync(user);
+                if (!updateResult.Succeeded)
+                {
+                    var errors = string.Join(", ", updateResult.Errors.Select(e => e.Description));
+                    throw new Exception($"User update failed: {errors}");
+                }
+            }
 
             if (!string.IsNullOrEmpty(dto.CurrentPassword) && !string.IsNullOrEmpty(dto.NewPassword))
             {
@@ -264,19 +287,17 @@ namespace E_PharmaHub.Services.PharmacistServ
             }
 
             if (!string.IsNullOrEmpty(dto.LicenseNumber))
-                pharmacist.LicenseNumber = dto.LicenseNumber;
-
-            if (image != null)
             {
-                var imagePath = await _fileStorage.SaveFileAsync(image, "pharmacistes");
-                user.ProfileImage = imagePath;
+                pharmacist.LicenseNumber = dto.LicenseNumber;
             }
-            _unitOfWork.Useres.Update(user);
+            pharmacist.AppUser = null;
             _unitOfWork.PharmasistsProfile.Update(pharmacist);
-            await _unitOfWork.CompleteAsync();
+
+                await _unitOfWork.CompleteAsync();
 
             return true;
         }
+
 
         public async Task DeletePharmacistAsync(int id)
         {
