@@ -7,7 +7,6 @@ namespace E_PharmaHub.Models
     {
         [Key] public int Id { get; set; }
         [Required(ErrorMessage = "Specialty is required.")]
-        [StringLength(100, ErrorMessage = "Specialty cannot exceed 100 characters.")]
         public Speciality Specialty { get; set; }
 
         [Range(1, int.MaxValue, ErrorMessage = "ClinicId must be a valid positive number.")]
