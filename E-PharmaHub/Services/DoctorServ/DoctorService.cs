@@ -307,12 +307,7 @@ namespace E_PharmaHub.Services.DoctorServ
                 if (!string.IsNullOrEmpty(clinic.ImagePath))
                     _fileStorage.DeleteFile(clinic.ImagePath, "clinics");
 
-                if (clinic.AddressId.HasValue)
-                {
-                    var address = await _unitOfWork.Addresses.GetByIdAsync(clinic.AddressId.Value);
-                    if (address != null)
-                        _unitOfWork.Addresses.Delete(address);
-                }
+             
 
                 var clinicReviews = await _unitOfWork.Reviews.GetReviewsByDoctorIdAsync(doctor.Id);
 
@@ -335,7 +330,7 @@ namespace E_PharmaHub.Services.DoctorServ
 
             if (!string.IsNullOrEmpty(doctor.AppUserId))
             {
-                var payment = await _unitOfWork.Payments.GetByPaymentIntendIdAsync(doctor.AppUserId);
+                var payment = await _unitOfWork.Payments.GetByReferenceIdAsync(doctor.AppUserId);
                 _unitOfWork.Payments.Delete(payment);
             }
 
