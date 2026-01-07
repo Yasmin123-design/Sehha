@@ -300,12 +300,12 @@ namespace E_PharmaHub.Services.DoctorServ
                 user.UserName = dto.UserName;
                 user.NormalizedUserName = dto.UserName.ToUpper();
             }
-            if (dto.ConsultationPrice != null || dto.ConsultationPrice != 0m)
+            if (dto.ConsultationPrice.HasValue)
             {
-                doctor.ConsultationPrice = dto.ConsultationPrice;
+                doctor.ConsultationPrice = dto.ConsultationPrice.Value;
             }
-            if (dto.ConsultationType != null)
-                doctor.ConsultationType = dto.ConsultationType;
+            if (dto.ConsultationType.HasValue)
+                doctor.ConsultationType = dto.ConsultationType.Value;
             if (dto.Specialty.HasValue)
                 doctor.Specialty = dto.Specialty.Value;
 
