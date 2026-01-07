@@ -219,11 +219,17 @@ namespace E_PharmaHub.Repositories.AppointmentRepo
         public async Task<int> GetTotalPatientsCountAsync(string doctorId)
         {
             return await _context.Appointments
-                .Where(a => a.DoctorId == doctorId && a.Status == AppointmentStatus.Confirmed)
+                .Where(a =>
+                    a.DoctorId == doctorId &&
+                    a.PaymentId != null &&
+                    a.Payment != null &&
+                    a.Payment.PaymentIntentId != null &&
+                    a.Status == AppointmentStatus.Confirmed)
                 .Select(a => a.UserId)
                 .Distinct()
                 .CountAsync();
         }
+
 
         public async Task<decimal> GetTodayRevenueAsync(string doctorId)
         {

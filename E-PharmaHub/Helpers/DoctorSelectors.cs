@@ -1,5 +1,6 @@
 ﻿using E_PharmaHub.Dtos;
 using E_PharmaHub.Models;
+using E_PharmaHub.Models.Enums;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
@@ -37,8 +38,14 @@ namespace E_PharmaHub.Helpers
                 AverageRating = d.Reviews.Any() ? d.Reviews.Average(r => r.Rating) : 0,
                 CountReviews = d.Reviews.Count,
 
-                CountPatient = appointments.Count(a => a.DoctorId == d.AppUserId),
-                CountFavourite = favouriteDoctors.Count(f => f.DoctorId == d.Id),
+                CountPatient = appointments.Count(
+                    a => a.DoctorId == d.AppUserId
+                    && 
+                    a.PaymentId != null &&
+                    a.Payment != null &&
+                    a.Payment.PaymentIntentId != null &&
+                    a.Status == AppointmentStatus.Confirmed),
+                CountFavourite = favouriteDoctors.Count(f => f.DoctorId == d.Id)
             };
         }
     }

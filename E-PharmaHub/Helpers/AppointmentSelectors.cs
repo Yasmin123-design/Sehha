@@ -21,7 +21,7 @@ namespace E_PharmaHub.Helpers
                 DoctorName = a.Doctor.UserName,
                 DoctorImage = a.Doctor.ProfileImage,
                 DoctorSpeciality = a.Doctor.DoctorProfile.Specialty,
-                UserId = a.UserId,
+                UserId = a.DoctorId,
                 UserNameLogged = a.User.UserName,
                 UserImageLogged = a.User.ProfileImage,
                 PatientAge = a.PatientAge,
