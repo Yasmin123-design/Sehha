@@ -255,10 +255,10 @@ namespace E_PharmaHub.Services.DoctorServ
         }
 
         public async Task<bool> UpdateDoctorProfileAsync(
-    string userId,
-    DoctorUpdateDto dto,
-        IFormFile? image
-)
+     string userId,
+     DoctorUpdateDto dto,
+     IFormFile? image
+ )
         {
             var doctor = await _unitOfWork.Doctors.GetDoctorByUserIdAsync(userId);
             if (doctor == null)
@@ -267,14 +267,51 @@ namespace E_PharmaHub.Services.DoctorServ
             var user = doctor.AppUser;
             if (user == null)
                 return false;
+
             bool userUpdated = false;
 
+            // -------- تحديث الصورة --------
             if (image != null)
             {
                 var imagePath = await _fileStorage.SaveFileAsync(image, "doctors");
-                user.ProfileImage = imagePath;      // لازم يكون عندك property في AppUser
+                user.ProfileImage = imagePath;
                 userUpdated = true;
             }
+            // ------------------------------
+
+            // -------- التحقق قبل تحديث الإيميل --------
+            if (!string.IsNullOrEmpty(dto.Email) && dto.Email != user.Email)
+            {
+                var existingEmailUser = await _userManager.FindByEmailAsync(dto.Email);
+
+                if (existingEmailUser != null && existingEmailUser.Id != userId)
+                    throw new Exception($"Email '{dto.Email}' is already registered.");
+
+                var emailResult = await _userManager.SetEmailAsync(user, dto.Email);
+                if (!emailResult.Succeeded)
+                {
+                    var errors = string.Join(", ", emailResult.Errors.Select(e => e.Description));
+                    throw new Exception($"Email update failed: {errors}");
+                }
+
+                userUpdated = true;
+            }
+            // -------------------------------------------
+
+            // -------- التحقق قبل تحديث اسم المستخدم --------
+            if (!string.IsNullOrEmpty(dto.UserName) && dto.UserName != user.UserName)
+            {
+                var existingUserNameUser = await _userManager.FindByNameAsync(dto.UserName);
+
+                if (existingUserNameUser != null && existingUserNameUser.Id != userId)
+                    throw new Exception($"Username '{dto.UserName}' is already taken.");
+
+                user.UserName = dto.UserName;
+                user.NormalizedUserName = dto.UserName.ToUpper();
+
+                userUpdated = true;
+            }
+  
             if (userUpdated)
             {
                 var updateResult = await _userManager.UpdateAsync(user);
@@ -284,39 +321,38 @@ namespace E_PharmaHub.Services.DoctorServ
                     throw new Exception($"User update failed: {errors}");
                 }
             }
-            if (!string.IsNullOrEmpty(dto.Email) && dto.Email != user.Email)
-            {
-                var emailResult = await _userManager.SetEmailAsync(user, dto.Email);
-                if (!emailResult.Succeeded)
-                    return false;
-
-                var userNameResult = await _userManager.SetUserNameAsync(user, dto.Email);
-                if (!userNameResult.Succeeded)
-                    return false;
-            }
-
-            if (!string.IsNullOrEmpty(dto.UserName) && dto.UserName != user.UserName)
-            {
-                user.UserName = dto.UserName;
-                user.NormalizedUserName = dto.UserName.ToUpper();
-            }
+           
+        
             if (dto.ConsultationPrice.HasValue)
             {
                 doctor.ConsultationPrice = dto.ConsultationPrice.Value;
             }
+
             if (dto.ConsultationType.HasValue)
+            {
                 doctor.ConsultationType = dto.ConsultationType.Value;
+            }
+
             if (dto.Specialty.HasValue)
+            {
                 doctor.Specialty = dto.Specialty.Value;
+            }
 
             if (dto.Gender.HasValue)
+            {
                 doctor.Gender = dto.Gender.Value;
+            }
+            // -------------------------------------------
+
+            // لتجنب أي مشكلة Tracking مع العلاقة
+            doctor.AppUser = null;
 
             _unitOfWork.Doctors.Update(doctor);
             await _unitOfWork.CompleteAsync();
 
             return true;
         }
+
 
         public async Task DeleteDoctorAsync(int id)
         {
