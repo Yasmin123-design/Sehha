@@ -383,8 +383,26 @@ namespace E_PharmaHub.Controllers
 
             return Ok(new { message });
         }
+        [HttpGet("getdoctor/{userId}")]
+        public async Task<IActionResult> GetDoctorByUserId(string userId)
+        {
+            var doctor = await _doctorService.GetDoctorByUserIdAsync(userId);
 
+            if (doctor == null)
+                return NotFound(new { message = "Doctor not found for this user id" });
 
+            return Ok(doctor);
+        }
+        [HttpGet("getpharmacist/{userId}")]
+        public async Task<IActionResult> GetPharmacistByUserId(string userId)
+        {
+            var result = await _pharmacistService.GetPharmacistByUserIdAsync(userId);
+
+            if (result == null)
+                return NotFound(new { message = "Pharmacist not found for this user id" });
+
+            return Ok(result);
+        }
         //[HttpDelete("deleteuser/{userId}")]
         //public async Task<IActionResult> DeleteUser(string userId)
         //{

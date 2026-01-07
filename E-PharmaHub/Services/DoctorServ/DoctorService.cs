@@ -205,8 +205,6 @@ namespace E_PharmaHub.Services.DoctorServ
 
             return (true, "Doctor approved successfully after confirming payment.");
         }
-
-
         public async Task<(bool success, string message)> RejectDoctorAsync(int doctorId)
         {
             var doctor = await _unitOfWork.Doctors.GetByIdAsync(doctorId);
