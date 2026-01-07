@@ -8,8 +8,8 @@ namespace E_PharmaHub.Dtos
         public string? Email { get; set; }
         public Speciality? Specialty { get; set; }
         public Gender? Gender { get; set; }
-        public decimal ConsultationPrice { get; set; }
-        public ConsultationType ConsultationType { get; set; }
+        public decimal? ConsultationPrice { get; set; }
+        public ConsultationType? ConsultationType { get; set; }
 
     }
 }
