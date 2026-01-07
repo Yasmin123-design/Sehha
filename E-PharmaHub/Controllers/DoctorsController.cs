@@ -120,24 +120,22 @@ namespace E_PharmaHub.Controllers
         [HttpPut("update-doctorprofile")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Doctor")]
         public async Task<IActionResult> UpdateDoctorProfile(
-[FromForm] DoctorUpdateDto dto,
-            IFormFile? image
+    [FromForm] DoctorUpdateDto dto,
+    IFormFile? image,
+    string userId
 )
         {
             if (string.IsNullOrEmpty(userId))
-                return Unauthorized();
+                return Unauthorized(new { message = "User not authenticated." });
 
-            var result = await _doctorService.UpdateDoctorProfileAsync(
-                userId,
-                dto,
-                image
-            );
+            var (success, errorMessage) = await _doctorService.UpdateDoctorProfileAsync(userId, dto, image);
 
-            if (!result)
-                return NotFound("Doctor not found");
+            if (!success)
+                return BadRequest(new { message = errorMessage });
 
             return Ok(new { message = "Doctor profile updated successfully" });
         }
+
 
         [HttpGet("{doctorId}/slots")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
