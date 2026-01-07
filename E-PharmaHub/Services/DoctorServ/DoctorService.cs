@@ -7,6 +7,7 @@ using E_PharmaHub.Services.PaymentServ;
 using E_PharmaHub.Services.StripePaymentServ;
 using E_PharmaHub.UnitOfWorkes;
 using Microsoft.AspNetCore.Identity;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace E_PharmaHub.Services.DoctorServ
 {
@@ -255,7 +256,9 @@ namespace E_PharmaHub.Services.DoctorServ
 
         public async Task<bool> UpdateDoctorProfileAsync(
     string userId,
-    DoctorUpdateDto dto)
+    DoctorUpdateDto dto,
+        IFormFile? image
+)
         {
             var doctor = await _unitOfWork.Doctors.GetDoctorByUserIdAsync(userId);
             if (doctor == null)
@@ -264,7 +267,23 @@ namespace E_PharmaHub.Services.DoctorServ
             var user = doctor.AppUser;
             if (user == null)
                 return false;
+            bool userUpdated = false;
 
+            if (image != null)
+            {
+                var imagePath = await _fileStorage.SaveFileAsync(image, "doctors");
+                user.ProfileImage = imagePath;      // لازم يكون عندك property في AppUser
+                userUpdated = true;
+            }
+            if (userUpdated)
+            {
+                var updateResult = await _userManager.UpdateAsync(user);
+                if (!updateResult.Succeeded)
+                {
+                    var errors = string.Join(", ", updateResult.Errors.Select(e => e.Description));
+                    throw new Exception($"User update failed: {errors}");
+                }
+            }
             if (!string.IsNullOrEmpty(dto.Email) && dto.Email != user.Email)
             {
                 var emailResult = await _userManager.SetEmailAsync(user, dto.Email);

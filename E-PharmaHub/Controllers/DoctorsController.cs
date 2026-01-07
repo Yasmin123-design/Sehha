@@ -120,7 +120,8 @@ namespace E_PharmaHub.Controllers
         [HttpPut("update-doctorprofile")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Doctor")]
         public async Task<IActionResult> UpdateDoctorProfile(
-[FromForm] DoctorUpdateDto dto
+[FromForm] DoctorUpdateDto dto,
+            IFormFile? image
 )
         {
             if (string.IsNullOrEmpty(userId))
@@ -128,7 +129,8 @@ namespace E_PharmaHub.Controllers
 
             var result = await _doctorService.UpdateDoctorProfileAsync(
                 userId,
-                dto
+                dto,
+                image
             );
 
             if (!result)

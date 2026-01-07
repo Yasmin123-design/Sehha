@@ -166,7 +166,7 @@ namespace E_PharmaHub.Controllers
 
         [HttpPut("update-doctorprofile/{userId}")]
         public async Task<IActionResult> UpdateDoctorProfile(
-[FromForm] DoctorUpdateDto dto ,string userId
+[FromForm] DoctorUpdateDto dto ,string userId , IFormFile? image
 )
         {
             if (string.IsNullOrEmpty(userId))
@@ -174,7 +174,7 @@ namespace E_PharmaHub.Controllers
 
             var result = await _doctorService.UpdateDoctorProfileAsync(
                 userId,
-                dto
+                dto,image
             );
 
             if (!result)
