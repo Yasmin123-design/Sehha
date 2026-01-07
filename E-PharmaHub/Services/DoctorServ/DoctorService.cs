@@ -7,7 +7,7 @@ using E_PharmaHub.Services.PaymentServ;
 using E_PharmaHub.Services.StripePaymentServ;
 using E_PharmaHub.UnitOfWorkes;
 using Microsoft.AspNetCore.Identity;
-using static System.Net.Mime.MediaTypeNames;
+using Microsoft.EntityFrameworkCore;
 
 namespace E_PharmaHub.Services.DoctorServ
 {
@@ -254,75 +254,46 @@ namespace E_PharmaHub.Services.DoctorServ
             return await _unitOfWork.Doctors.GetFilteredDoctorsAsync(specialty,name, gender, sortOrder, consultationType);
         }
 
-        public async Task<bool> UpdateDoctorProfileAsync(
-     string userId,
-     DoctorUpdateDto dto,
-     IFormFile? image
- )
+        public async Task<bool> UpdateDoctorProfileAsync(string userId, DoctorUpdateDto dto, IFormFile? image)
         {
             var doctor = await _unitOfWork.Doctors.GetDoctorByUserIdAsync(userId);
-            if (doctor == null)
-                return false;
+            if (doctor == null) return false;
 
-            var user = doctor.AppUser;
-            if (user == null)
-                return false;
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null) return false;
 
-            bool userUpdated = false;
+            // Update AppUser fields
+            if (!string.IsNullOrEmpty(dto.UserName))
+            {
+                user.UserName = dto.UserName;
+            }
 
-            // -------- تحديث الصورة --------
+            if (!string.IsNullOrEmpty(dto.Email))
+            {
+                user.Email = dto.Email;
+            }
+
+            // Handle Profile Image update
             if (image != null)
             {
-                var imagePath = await _fileStorage.SaveFileAsync(image, "doctors");
-                user.ProfileImage = imagePath;
-                userUpdated = true;
-            }
-            // ------------------------------
-
-            // -------- التحقق قبل تحديث الإيميل --------
-            if (!string.IsNullOrEmpty(dto.Email) && dto.Email != user.Email)
-            {
-                var existingEmailUser = await _userManager.FindByEmailAsync(dto.Email);
-
-                if (existingEmailUser != null && existingEmailUser.Id != userId)
-                    throw new Exception($"Email '{dto.Email}' is already registered.");
-
-                var emailResult = await _userManager.SetEmailAsync(user, dto.Email);
-                if (!emailResult.Succeeded)
+                if (!string.IsNullOrEmpty(user.ProfileImage))
                 {
-                    var errors = string.Join(", ", emailResult.Errors.Select(e => e.Description));
-                    throw new Exception($"Email update failed: {errors}");
+                    _fileStorage.DeleteFile(user.ProfileImage, "doctors");
                 }
-
-                userUpdated = true;
+                user.ProfileImage = await _fileStorage.SaveFileAsync(image, "doctors");
             }
-            // -------------------------------------------
 
-            // -------- التحقق قبل تحديث اسم المستخدم --------
-            if (!string.IsNullOrEmpty(dto.UserName) && dto.UserName != user.UserName)
+            // Update DoctorProfile fields
+            if (dto.Specialty.HasValue)
             {
-                var existingUserNameUser = await _userManager.FindByNameAsync(dto.UserName);
-
-                if (existingUserNameUser != null && existingUserNameUser.Id != userId)
-                    throw new Exception($"Username '{dto.UserName}' is already taken.");
-
-                user.UserName = dto.UserName;
-                user.NormalizedUserName = dto.UserName.ToUpper();
-
-                userUpdated = true;
+                doctor.Specialty = dto.Specialty.Value;
             }
-  
-            if (userUpdated)
+
+            if (dto.Gender.HasValue)
             {
-                var updateResult = await _userManager.UpdateAsync(user);
-                if (!updateResult.Succeeded)
-                {
-                    var errors = string.Join(", ", updateResult.Errors.Select(e => e.Description));
-                    throw new Exception($"User update failed: {errors}");
-                }
+                doctor.Gender = dto.Gender.Value;
             }
-           
-        
+
             if (dto.ConsultationPrice.HasValue)
             {
                 doctor.ConsultationPrice = dto.ConsultationPrice.Value;
@@ -333,25 +304,17 @@ namespace E_PharmaHub.Services.DoctorServ
                 doctor.ConsultationType = dto.ConsultationType.Value;
             }
 
-            if (dto.Specialty.HasValue)
+            // Save changes
+            var userUpdateResult = await _userManager.UpdateAsync(user);
+            if (!userUpdateResult.Succeeded)
             {
-                doctor.Specialty = dto.Specialty.Value;
+                return false;
             }
 
-            if (dto.Gender.HasValue)
-            {
-                doctor.Gender = dto.Gender.Value;
-            }
-            // -------------------------------------------
-
-            // لتجنب أي مشكلة Tracking مع العلاقة
-            doctor.AppUser = null;
-
-            _unitOfWork.Doctors.Update(doctor);
             await _unitOfWork.CompleteAsync();
-
             return true;
         }
+
 
 
         public async Task DeleteDoctorAsync(int id)

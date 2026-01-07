@@ -60,7 +60,7 @@ namespace E_PharmaHub.Controllers
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Pharmacist")]
         [HttpPut("update-profile")]
-        public async Task<IActionResult> UpdateProfile([FromForm] PharmacistUpdateDto dto, IFormFile? image)
+        public async Task<IActionResult> UpdatePharmacistProfile([FromForm] PharmacistUpdateDto dto, IFormFile? image)
         {
             try
             {

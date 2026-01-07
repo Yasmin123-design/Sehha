@@ -96,10 +96,12 @@ namespace E_PharmaHub
 
 
             builder.Services.AddControllers()
-                         .AddJsonOptions(options =>
-                               {
-                                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase, allowIntegerValues: true));
-                                });
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase, allowIntegerValues: true));
+                    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+                    options.JsonSerializerOptions.WriteIndented = true;
+                });
             builder.Services.AddScoped<IEmailSender, EmailSender>();
 
 
@@ -241,7 +243,10 @@ namespace E_PharmaHub
        
 
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
+            });
 
             builder.Services.AddDbContext<EHealthDbContext>(options =>
             options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -257,12 +262,6 @@ namespace E_PharmaHub
 
 
 
-            builder.Services.AddControllers()
-            .AddJsonOptions(options =>
-            {
-              options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
-              options.JsonSerializerOptions.WriteIndented = true;
-            });
             StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
 
             var app = builder.Build();

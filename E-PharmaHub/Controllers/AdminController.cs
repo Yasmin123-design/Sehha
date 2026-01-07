@@ -165,16 +165,18 @@ namespace E_PharmaHub.Controllers
         }
 
         [HttpPut("update-doctorprofile/{userId}")]
-        public async Task<IActionResult> UpdateDoctorProfile(
-[FromForm] DoctorUpdateDto dto ,string userId , IFormFile? image
-)
+        public async Task<IActionResult> UpdateDoctorProfileByAdmin(
+            string userId,
+            [FromForm] DoctorUpdateDto dto,
+            [FromForm] IFormFile? image
+        )
         {
             if (string.IsNullOrEmpty(userId))
                 return Unauthorized();
 
             var result = await _doctorService.UpdateDoctorProfileAsync(
                 userId,
-                dto,image
+                dto, image
             );
 
             if (!result)
@@ -184,7 +186,7 @@ namespace E_PharmaHub.Controllers
         }
 
         [HttpPut("updatepharmacist-profile/{userId}")]
-        public async Task<IActionResult> UpdateProfile([FromForm] PharmacistUpdateDto dto, IFormFile? image , string userId)
+        public async Task<IActionResult> UpdatePharmacistProfileByAdmin([FromForm] PharmacistUpdateDto dto, IFormFile? image , string userId)
         {
             try
             {
