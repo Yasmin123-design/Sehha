@@ -236,15 +236,18 @@ namespace E_PharmaHub.Services.PharmacistServ
             return (true, "Pharmacist rejected successfully and payment refunded.");
         }
 
-        public async Task<bool> UpdatePharmacistProfileAsync(string userId, PharmacistUpdateDto dto, IFormFile? image)
+        public async Task<(bool Success, string? ErrorMessage)> UpdatePharmacistProfileAsync(
+    string userId,
+    PharmacistUpdateDto dto,
+    IFormFile? image)
         {
             var pharmacist = await _unitOfWork.PharmasistsProfile.GetByUserIdAsync(userId);
             if (pharmacist == null)
-                return false;
+                return (false, "Pharmacist profile not found");
 
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
-                return false;
+                return (false, "User not found");
 
             bool userUpdated = false;
 
@@ -273,7 +276,7 @@ namespace E_PharmaHub.Services.PharmacistServ
                 if (!updateResult.Succeeded)
                 {
                     var errors = string.Join(", ", updateResult.Errors.Select(e => e.Description));
-                    throw new Exception($"User update failed: {errors}");
+                    return (false, $"User update failed: {errors}");
                 }
             }
 
@@ -283,7 +286,7 @@ namespace E_PharmaHub.Services.PharmacistServ
                 if (!passResult.Succeeded)
                 {
                     var errors = string.Join(", ", passResult.Errors.Select(e => e.Description));
-                    throw new Exception($"Password update failed: {errors}");
+                    return (false, $"Password update failed: {errors}");
                 }
             }
 
@@ -291,13 +294,14 @@ namespace E_PharmaHub.Services.PharmacistServ
             {
                 pharmacist.LicenseNumber = dto.LicenseNumber;
             }
+
             pharmacist.AppUser = null;
             _unitOfWork.PharmasistsProfile.Update(pharmacist);
+            await _unitOfWork.CompleteAsync();
 
-                await _unitOfWork.CompleteAsync();
-
-            return true;
+            return (true, null);
         }
+
 
 
         public async Task DeletePharmacistAsync(int id)

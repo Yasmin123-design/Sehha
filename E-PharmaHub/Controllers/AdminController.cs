@@ -183,21 +183,20 @@ namespace E_PharmaHub.Controllers
         }
 
         [HttpPut("updatepharmacist-profile/{userId}")]
-        public async Task<IActionResult> UpdatePharmacistProfileByAdmin([FromForm] PharmacistUpdateDto dto, IFormFile? image , string userId)
+        public async Task<IActionResult> UpdatePharmacistProfileByAdmin(
+    [FromForm] PharmacistUpdateDto dto,
+    IFormFile? image,
+    string userId)
         {
-            try
-            {
-                var result = await _pharmacistService.UpdatePharmacistProfileAsync(userId, dto, image);
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized(new { message = "User not authenticated." });
 
-                if (!result)
-                    return NotFound(new { message = "Pharmacist profile not found." });
+            var (success, message) = await _pharmacistService.UpdatePharmacistProfileAsync(userId, dto, image);
 
-                return Ok(new { message = "Pharmacist profile updated successfully ✅" });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+            if (!success)
+                return BadRequest(new { message });
+
+            return Ok(new { message = "Pharmacist profile updated successfully ✅" });
         }
 
         [HttpGet("GetPharmacyOfPharmacist/{userId}")]
