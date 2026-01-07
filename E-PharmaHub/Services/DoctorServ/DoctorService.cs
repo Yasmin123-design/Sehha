@@ -301,33 +301,63 @@ namespace E_PharmaHub.Services.DoctorServ
                 throw new Exception("Doctor not found.");
 
             var clinic = await _unitOfWork.Clinics.GetByIdAsync(doctor.ClinicId ?? 0);
+
             if (clinic != null)
             {
                 if (!string.IsNullOrEmpty(clinic.ImagePath))
                     _fileStorage.DeleteFile(clinic.ImagePath, "clinics");
 
+                if (clinic.AddressId.HasValue)
+                {
+                    var address = await _unitOfWork.Addresses.GetByIdAsync(clinic.AddressId.Value);
+                    if (address != null)
+                        _unitOfWork.Addresses.Delete(address);
+                }
+
+                var clinicReviews = await _unitOfWork.Reviews.GetReviewsByDoctorIdAsync(doctor.Id);
+
+                foreach (var review in clinicReviews)
+                {
+                    _unitOfWork.Reviews.Delete(review);
+                }
+
+                var appointments = await _unitOfWork.Appointments.GetAppointmentsByDoctorIdAsync(doctor.AppUserId);
+
+                foreach (var app in appointments)
+                {
+                    var item = await _unitOfWork.Appointments.GetByIdAsync(app.Id);
+                    _unitOfWork.Appointments.Delete(item);
+                }
+
                 _unitOfWork.Clinics.Delete(clinic);
             }
 
-            _unitOfWork.Doctors.Delete(doctor);
+
+            if (!string.IsNullOrEmpty(doctor.AppUserId))
+            {
+                var payment = await _unitOfWork.Payments.GetByPaymentIntendIdAsync(doctor.AppUserId);
+                _unitOfWork.Payments.Delete(payment);
+            }
 
             if (!string.IsNullOrEmpty(doctor.AppUserId))
             {
                 var user = await _userManager.FindByIdAsync(doctor.AppUserId);
+
+                
                 if (user != null)
                 {
-                    var result = await _userManager.DeleteAsync(user);
-                    if (!result.Succeeded)
-                        throw new Exception("Failed to delete user account.");
+                    if (!string.IsNullOrEmpty(user.ProfileImage))
+                        _fileStorage.DeleteFile(user.ProfileImage, "doctors");
+
+                    await _userManager.DeleteAsync(user);
                 }
             }
-            var payment = await _paymentService.GetByReferenceIdAsync(doctor.AppUserId);
-            if (payment != null)
-            {
-                _paymentService.DeletePaymentAsync(payment);
-            }
+
+            _unitOfWork.Doctors.Delete(doctor);
+
             await _unitOfWork.CompleteAsync();
         }
+
 
         public async Task<DoctorReadDto?> GetByIdDetailsAsync(int id)
         {

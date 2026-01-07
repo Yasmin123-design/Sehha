@@ -6,6 +6,7 @@ namespace E_PharmaHub.Repositories.OrderRepo
 {
     public interface IOrderRepository
     {
+        void Delete(Order order);
         Task<int> GetTotalOrdersAsync(int pharmacyId);
         Task<decimal> GetTotalRevenueAsync(int pharmacyId);
         Task<int> GetTotalCustomersAsync(int pharmacyId);

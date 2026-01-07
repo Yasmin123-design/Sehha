@@ -9,6 +9,7 @@ using E_PharmaHub.UnitOfWorkes;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Routing.Matching;
 using Microsoft.EntityFrameworkCore;
+using Stripe.Climate;
 using Address = E_PharmaHub.Models.Address;
 
 namespace E_PharmaHub.Services.PharmacistServ
@@ -305,22 +306,61 @@ namespace E_PharmaHub.Services.PharmacistServ
             if (pharmacist == null)
                 throw new Exception("Pharmacist not found.");
 
-            var user = await _userManager.FindByIdAsync(pharmacist.AppUserId);
-            if (user != null)
-                await _userManager.DeleteAsync(user);
-
+           
             var pharmacy = await _unitOfWork.Pharmacies.GetByIdAsync(pharmacist.PharmacyId);
+
             if (pharmacy != null)
             {
                 if (!string.IsNullOrEmpty(pharmacy.ImagePath))
                     _fileStorage.DeleteFile(pharmacy.ImagePath, "pharmacies");
 
+                var inventoryItems = await _unitOfWork.IinventoryItem
+                    .GetByPharmacyIdAsync(pharmacy.Id);
+
+                foreach (var item in inventoryItems)
+                {
+                    if(item != null)
+                    {
+                        var invenItem = await _unitOfWork.IinventoryItem.GetInventoryItemByIdAsync(item.Id.Value);
+                        _unitOfWork.IinventoryItem.Delete(invenItem);
+                    }
+                    
+                }
+
+                var orders = await _unitOfWork.Order
+                    .GetByPharmacyIdAsync(pharmacy.Id);
+
+                foreach (var order in orders)
+                {
+                    var item = await _unitOfWork.Order.GetOrderByIdAsync(order.Id);
+                    _unitOfWork.Order.Delete(item);
+                }
+
+                var reviews = await _unitOfWork.Reviews
+                    .GetReviewDtosByPharmacyIdAsync(pharmacy.Id);
+
+                foreach (var review in reviews)
+                {
+                    var item = await _unitOfWork.Reviews.GetByIdAsync(review.Id);
+                    _unitOfWork.Reviews.Delete(item);
+                }
+
                 _unitOfWork.Pharmacies.Delete(pharmacy);
             }
 
+            var user = await _userManager.FindByIdAsync(pharmacist.AppUserId);
+
+            if (!string.IsNullOrEmpty(user.ProfileImage))
+                _fileStorage.DeleteFile(user.ProfileImage, "users");
+
+            if (user != null)
+                await _userManager.DeleteAsync(user);
+
             _unitOfWork.PharmasistsProfile.Delete(pharmacist);
+
             await _unitOfWork.CompleteAsync();
         }
+
 
         public async Task<IEnumerable<PharmacistReadDto>> GetAllPharmacistsAsync()
         {

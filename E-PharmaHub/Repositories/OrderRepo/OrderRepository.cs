@@ -67,7 +67,10 @@ namespace E_PharmaHub.Repositories.OrderRepo
 
             order.PaymentStatus = PaymentStatus.Paid;
         }
-
+        public void Delete(Order order)
+        {
+            _context.Orders.Remove(order);
+        }
         public async Task<Order?> GetByPaymentIdEntityAsync(int paymentId)
         {
             return await BaseOrderIncludes()
