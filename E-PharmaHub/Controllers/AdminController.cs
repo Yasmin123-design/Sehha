@@ -166,21 +166,18 @@ namespace E_PharmaHub.Controllers
 
         [HttpPut("update-doctorprofile/{userId}")]
         public async Task<IActionResult> UpdateDoctorProfileByAdmin(
-            string userId,
-            [FromForm] DoctorUpdateDto dto,
-            [FromForm] IFormFile? image
-        )
+    string userId,
+    [FromForm] DoctorUpdateDto dto,
+    [FromForm] IFormFile? image
+)
         {
             if (string.IsNullOrEmpty(userId))
                 return Unauthorized();
 
-            var result = await _doctorService.UpdateDoctorProfileAsync(
-                userId,
-                dto, image
-            );
+            var (success, errorMessage) = await _doctorService.UpdateDoctorProfileAsync(userId, dto, image);
 
-            if (!result)
-                return NotFound("Doctor not found");
+            if (!success)
+                return BadRequest(new { message = errorMessage });
 
             return Ok(new { message = "Doctor profile updated successfully" });
         }

@@ -254,67 +254,44 @@ namespace E_PharmaHub.Services.DoctorServ
             return await _unitOfWork.Doctors.GetFilteredDoctorsAsync(specialty,name, gender, sortOrder, consultationType);
         }
 
-        public async Task<bool> UpdateDoctorProfileAsync(string userId, DoctorUpdateDto dto, IFormFile? image)
+        public async Task<(bool Success, string? ErrorMessage)> UpdateDoctorProfileAsync(
+    string userId,
+    DoctorUpdateDto dto,
+    IFormFile? image)
         {
             var doctor = await _unitOfWork.Doctors.GetDoctorByUserIdAsync(userId);
-            if (doctor == null) return false;
+            if (doctor == null) return (false, "Doctor not found");
 
             var user = await _userManager.FindByIdAsync(userId);
-            if (user == null) return false;
+            if (user == null) return (false, "User not found");
 
-            // Update AppUser fields
             if (!string.IsNullOrEmpty(dto.UserName))
-            {
                 user.UserName = dto.UserName;
-            }
-
             if (!string.IsNullOrEmpty(dto.Email))
-            {
                 user.Email = dto.Email;
-            }
 
-            // Handle Profile Image update
             if (image != null)
             {
                 if (!string.IsNullOrEmpty(user.ProfileImage))
-                {
                     _fileStorage.DeleteFile(user.ProfileImage, "doctors");
-                }
                 user.ProfileImage = await _fileStorage.SaveFileAsync(image, "doctors");
             }
 
-            // Update DoctorProfile fields
-            if (dto.Specialty.HasValue)
-            {
-                doctor.Specialty = dto.Specialty.Value;
-            }
+            if (dto.Specialty.HasValue) doctor.Specialty = dto.Specialty.Value;
+            if (dto.Gender.HasValue) doctor.Gender = dto.Gender.Value;
+            if (dto.ConsultationPrice.HasValue) doctor.ConsultationPrice = dto.ConsultationPrice.Value;
+            if (dto.ConsultationType.HasValue) doctor.ConsultationType = dto.ConsultationType.Value;
 
-            if (dto.Gender.HasValue)
-            {
-                doctor.Gender = dto.Gender.Value;
-            }
-
-            if (dto.ConsultationPrice.HasValue)
-            {
-                doctor.ConsultationPrice = dto.ConsultationPrice.Value;
-            }
-
-            if (dto.ConsultationType.HasValue)
-            {
-                doctor.ConsultationType = dto.ConsultationType.Value;
-            }
-
-            // Save changes
             var userUpdateResult = await _userManager.UpdateAsync(user);
             if (!userUpdateResult.Succeeded)
             {
-                return false;
+                var errors = string.Join(", ", userUpdateResult.Errors.Select(e => e.Description));
+                return (false, errors);
             }
 
             await _unitOfWork.CompleteAsync();
-            return true;
+            return (true, null);
         }
-
 
 
         public async Task DeleteDoctorAsync(int id)
