@@ -373,6 +373,18 @@ namespace E_PharmaHub.Controllers
 
             return Ok("Password changed successfully");
         }
+        [HttpPut("update-clinic/{userId}")]
+        public async Task<IActionResult> UpdateClinic([FromForm] ClinicUpdateDto dto,string userId, IFormFile? image)
+        {    
+            var (success, message) = await _clinicService.UpdateClinicAsync(userId, dto, image);
+
+            if (!success)
+                return BadRequest(new { message });
+
+            return Ok(new { message });
+        }
+
+
         //[HttpDelete("deleteuser/{userId}")]
         //public async Task<IActionResult> DeleteUser(string userId)
         //{
