@@ -81,7 +81,9 @@ namespace E_PharmaHub.Repositories.AppointmentRepo
         public async Task<IEnumerable<AppointmentResponseDto>> GetAppointmentsByDoctorIdAsync(string doctorId)
         {
             return await BaseAppointmentIncludes()
-                .Where(a => a.DoctorId == doctorId && a.PaymentId != null && a.Payment.PaymentIntentId != null)
+                .Where(a => a.DoctorId == doctorId 
+                && a.PaymentId != null 
+                && a.Payment.PaymentIntentId != null)
                 .Select(Selector)
                 .ToListAsync();
         }
