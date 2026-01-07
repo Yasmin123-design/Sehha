@@ -21,7 +21,7 @@ namespace E_PharmaHub.Repositories.ClinicRepo
                 .Include(c => c.Address)
                 .AsNoTracking()
                 .Where(c => _context.DoctorProfiles
-                    .Any(d => d.ClinicId == c.Id && d.IsApproved));
+                    .Any(d => d.ClinicId == c.Id));
         }
 
         private Expression<Func<Clinic, ClinicDto>> Selector => ClinicSelectors.ClinicDtoSelector;
@@ -40,7 +40,8 @@ namespace E_PharmaHub.Repositories.ClinicRepo
 
         public async Task<Clinic?> GetByIdAsync(int id)
         {
-            return await BaseClinicIncludes()
+            return await _context.Clinics
+                .Include(c => c.Address)
                 .FirstOrDefaultAsync(c => c.Id == id);
         }
 
