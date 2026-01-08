@@ -4,6 +4,7 @@ using E_PharmaHub.Models;
 using E_PharmaHub.Models.Enums;
 using E_PharmaHub.Services.AppointmentNotificationScheduleServe;
 using E_PharmaHub.Services.NotificationServ;
+using E_PharmaHub.Services.UserServ;
 using E_PharmaHub.UnitOfWorkes;
 using Stripe;
 using Stripe.Checkout;
@@ -13,16 +14,19 @@ namespace E_PharmaHub.Services.PaymentServ
     public class PaymentService : IPaymentService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IUserService _userService;
         private readonly INotificationService _notificationService;
         private readonly IAppointmentNotificationScheduler _appointmentNotificationScheduler;
 
         public PaymentService(
             IUnitOfWork unitOfWork,
             INotificationService notificationService,
+            IUserService userService,
             IAppointmentNotificationScheduler appointmentNotificationScheduler
            )
         {
             _unitOfWork = unitOfWork;
+            _userService = userService;
             _notificationService = notificationService;
             _appointmentNotificationScheduler = appointmentNotificationScheduler;
         }
@@ -48,7 +52,6 @@ namespace E_PharmaHub.Services.PaymentServ
 
             if (payment.PaymentFor == PaymentForType.Appointment)
             {
-
                 var appointment = await _unitOfWork.Appointments
                     .GetAppointmentByPaymentIdAsync(payment.Id);
 
@@ -78,12 +81,35 @@ namespace E_PharmaHub.Services.PaymentServ
                    NotificationType.NewOrderForPharmacist
                );
             }
+            else if (payment.PaymentFor == PaymentForType.DoctorRegistration)
+            {
+                var user = await _unitOfWork.Useres.GetByIdAsync(payment.ReferenceId);
+                var adminUserId = await _userService.GetAdminUserIdAsync();
+
+                await _notificationService.CreateAndSendAsync(
+                    adminUserId,
+                    "New Doctor Registeration",
+                    $"Doctor {user.UserName} requested an approval",
+                    NotificationType.NewDoctorRegisteration
+                );
+            }
+            else if (payment.PaymentFor == PaymentForType.PharmacistRegistration)
+            {
+                var user = await _unitOfWork.Useres.GetByIdAsync(payment.ReferenceId);
+                var adminUserId = await _userService.GetAdminUserIdAsync();
+
+                await _notificationService.CreateAndSendAsync(
+                    adminUserId,
+                    "New Pharmacist Registeration",
+                    $"Pharmacist {user.UserName} requested an approval",
+                    NotificationType.NewPharmacistRegiseration
+                );
+            }
         }
         public async Task<Payment> GetByReferenceIdAsync(string referenceId)
         {
             return await _unitOfWork.Payments.GetByReferenceIdAsync(referenceId);
         }
-
         public async Task<object> VerifySessionAsync(string sessionId)
         {
             var stripeService = new SessionService();

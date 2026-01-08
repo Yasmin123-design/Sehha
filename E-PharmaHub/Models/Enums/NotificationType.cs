@@ -12,6 +12,8 @@
         NewAppointmentForDoctor,
         NewOrderForPharmacist,
         InventoryOutOfStock,
-        InventoryLowStock
+        InventoryLowStock,
+        NewDoctorRegisteration,
+        NewPharmacistRegiseration
     }
 }

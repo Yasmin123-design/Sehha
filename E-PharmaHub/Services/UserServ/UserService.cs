@@ -34,6 +34,11 @@ namespace E_PharmaHub.Services.UserServ
             _userManager = userManager;
             _fileStorage = fileStorage;
         }
+        public async Task<string> GetAdminUserIdAsync()
+        {
+            var admins = await _userManager.GetUsersInRoleAsync("Admin");
+            return admins.First().Id;
+        }
         public async Task<List<RegularUserDto>> GetRegularUsersAsync()
         {
             var users = _userManager.Users.ToList();

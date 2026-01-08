@@ -1,10 +1,12 @@
 ﻿using E_PharmaHub.Dtos;
 using E_PharmaHub.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace E_PharmaHub.Services.UserServ
 {
     public interface IUserService
     {
+        Task<string> GetAdminUserIdAsync();
         Task<bool> DeleteUserAsync(string userId);
         Task RevokeAllRefreshTokensAsync(string userId);
         Task SaveRefreshTokenAsync(string userId, string refreshToken);
