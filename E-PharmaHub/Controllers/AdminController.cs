@@ -10,6 +10,7 @@ using E_PharmaHub.Services.UserServ;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace E_PharmaHub.Controllers
 {
@@ -400,6 +401,23 @@ namespace E_PharmaHub.Controllers
                 return NotFound(new { message = "Pharmacist not found for this user id" });
 
             return Ok(result);
+        }
+
+        [HttpGet("user-orders/{userId}")]
+        public async Task<IActionResult> GetUserOrders(string userId)
+        {
+            var orders = await _orderService.GetOrdersByUserIdAsync(userId);
+            return Ok(orders);
+        }
+
+        [HttpGet("user-appointments/{userId}")]
+        public async Task<IActionResult> GetByUser(string userId)
+        {
+            var appointments = await _appointmentService.GetAppointmentsByUserAsync(userId);
+            if (!appointments.Any())
+                return NotFound(new { message = "No appointments found for this patient." });
+
+            return Ok(appointments);
         }
         //[HttpDelete("deleteuser/{userId}")]
         //public async Task<IActionResult> DeleteUser(string userId)
