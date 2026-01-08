@@ -19,7 +19,7 @@ namespace E_PharmaHub.Helpers
                 PharmacyName = o.Pharmacy.Name,
                 PharmacyImage = o.Pharmacy.ImagePath,
                 PhoneNumber = o.PhoneNumber,
-                DelieveryFee = o.Pharmacy.DeliveryFee,
+                DelieveryFee = o.Pharmacy.DeliveryFee ?? 0,
                 TotalPrice = o.TotalPrice,
                 City = o.City,
                 Country = o.Country,
