@@ -1,4 +1,6 @@
-﻿using E_PharmaHub.Models;
+﻿using E_PharmaHub.Dtos;
+using E_PharmaHub.Helpers;
+using E_PharmaHub.Models;
 using E_PharmaHub.Models.Enums;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -12,6 +14,38 @@ namespace E_PharmaHub.Repositories.PaymentRepo
         public PaymentRepository(EHealthDbContext context)
         {
             _context = context;
+        }
+        public async Task<List<PaymentReadDto>> GetDoctorRegistrationPaymentsAsync()
+        {
+            return await GetByTypeAsync(PaymentForType.DoctorRegistration);
+        }
+
+        public async Task<List<PaymentReadDto>> GetPharmacistRegistrationPaymentsAsync()
+        {
+            return await GetByTypeAsync(PaymentForType.PharmacistRegistration);
+        }
+
+        public async Task<List<PaymentReadDto>> GetOrderPaymentsAsync()
+        {
+            return await GetByTypeAsync(PaymentForType.Order);
+        }
+
+        public async Task<List<PaymentReadDto>> GetAppointmentPaymentsAsync()
+        {
+            return await GetByTypeAsync(PaymentForType.Appointment);
+        }
+
+        private async Task<List<PaymentReadDto>> GetByTypeAsync(PaymentForType type)
+        {
+            return await _context.Payments
+                .Where(p => p.PaymentFor == type)
+                .Join(
+                    _context.Users,
+                    p => p.PayerUserId,
+                    u => u.Id,
+                    PaymentSelectors.ToPaymentResponse
+                )
+                .ToListAsync();
         }
         public void Delete(Payment entity)
         {

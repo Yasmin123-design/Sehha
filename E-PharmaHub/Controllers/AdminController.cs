@@ -4,6 +4,7 @@ using E_PharmaHub.Services.ClinicServ;
 using E_PharmaHub.Services.DoctorServ;
 using E_PharmaHub.Services.MedicineServ;
 using E_PharmaHub.Services.OrderServ;
+using E_PharmaHub.Services.PaymentServ;
 using E_PharmaHub.Services.PharmacistServ;
 using E_PharmaHub.Services.PharmacyServ;
 using E_PharmaHub.Services.UserServ;
@@ -27,6 +28,7 @@ namespace E_PharmaHub.Controllers
         private readonly IAppointmentService _appointmentService;
         private readonly IOrderService _orderService;
         private readonly IUserService _userService;
+        private readonly IPaymentService _paymentService;
         public AdminController(
             IDoctorService doctorService,
             IPharmacistService pharmacistService,
@@ -35,10 +37,12 @@ namespace E_PharmaHub.Controllers
             IMedicineService medicineService,
             IAppointmentService appointmentService,
             IOrderService orderService,
-            IUserService userService
+            IUserService userService,
+            IPaymentService paymentService
             )
         {
             _doctorService = doctorService;
+            _paymentService = paymentService;
             _pharmacistService = pharmacistService;
             _pharmacyService = pharmacyService;
             _clinicService = clinicService;
@@ -426,6 +430,21 @@ namespace E_PharmaHub.Controllers
 
             return Ok(patients);
         }
+        [HttpGet("payment/doctor-registrations")]
+        public async Task<IActionResult> GetDoctorRegistrations()
+        => Ok(await _paymentService.GetDoctorRegistrationPaymentsAsync());
+
+        [HttpGet("payment/pharmacist-registrations")]
+        public async Task<IActionResult> GetPharmacistRegistrations()
+            => Ok(await _paymentService.GetPharmacistRegistrationPaymentsAsync());
+
+        [HttpGet("payment/orders")]
+        public async Task<IActionResult> GetOrdersPayments()
+            => Ok(await _paymentService.GetOrderPaymentsAsync());
+
+        [HttpGet("payment/appointments")]
+        public async Task<IActionResult> GetAppointmentsPayments()
+            => Ok(await _paymentService.GetAppointmentPaymentsAsync());
         //[HttpDelete("deleteuser/{userId}")]
         //public async Task<IActionResult> DeleteUser(string userId)
         //{
