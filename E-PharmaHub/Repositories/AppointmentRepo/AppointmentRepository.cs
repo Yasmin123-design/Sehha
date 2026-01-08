@@ -61,6 +61,7 @@ namespace E_PharmaHub.Repositories.AppointmentRepo
                 .Include(a => a.Clinic)
                 .Include(a => a.Doctor)
                 .ThenInclude(a => a.DoctorProfile)
+                .OrderByDescending(a => a.CreatedAt)
                 .AsNoTracking();
         }
         public async Task<List<Appointment>> GetPatientsOfDoctorAsync(string doctorId)
@@ -193,6 +194,7 @@ namespace E_PharmaHub.Repositories.AppointmentRepo
                     a.StartAt < endDate &&
                     (a.Status == AppointmentStatus.Pending ||
                      a.Status == AppointmentStatus.Confirmed))
+                    .OrderByDescending(a => a.CreatedAt)
                 .ToListAsync();
         }
 
@@ -283,6 +285,7 @@ namespace E_PharmaHub.Repositories.AppointmentRepo
                     Date = g.Key,
                     Count = g.Count()
                 })
+
                 .ToListAsync();
 
             var result = Enumerable

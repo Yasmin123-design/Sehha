@@ -11,7 +11,7 @@ namespace E_PharmaHub.Helpers
             return a => new AppointmentResponseDto
             {
                 Id = a.Id,
-
+                CreatedAt = a.CreatedAt,
                 ClinicId = a.ClinicId,
                 ClinicName = a.Clinic.Name,
                 AppointmentAmount = a.Doctor.DoctorProfile.ConsultationPrice,

@@ -16,6 +16,7 @@ namespace E_PharmaHub.Models
         [ForeignKey(nameof(DoctorId))]
         public virtual AppUser Doctor { get; set; }
         public int? PaymentId { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         [ForeignKey(nameof(PaymentId))]
         public virtual Payment? Payment { get; set; }
