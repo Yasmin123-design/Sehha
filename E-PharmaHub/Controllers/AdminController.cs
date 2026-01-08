@@ -419,6 +419,13 @@ namespace E_PharmaHub.Controllers
 
             return Ok(appointments);
         }
+        [HttpGet("patientsofdoctor/{doctorId}")]
+        public async Task<IActionResult> GetMyPatients(string doctorId)
+        {            
+            var patients = await _appointmentService.GetDoctorPatientsAsync(doctorId);
+
+            return Ok(patients);
+        }
         //[HttpDelete("deleteuser/{userId}")]
         //public async Task<IActionResult> DeleteUser(string userId)
         //{
