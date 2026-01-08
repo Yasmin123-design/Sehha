@@ -16,7 +16,11 @@ namespace E_PharmaHub.Helpers
                 Status = p.Status,
                 Amount = p.Amount,
                 ProcessedAt = p.ProcessedAt,
-
+                PayerAddress = u.Address,
+                PayerImage = u.ProfileImage,
+                PayerLatitude = u.Latitude,
+                PayerLongitude = u.Longitude,
+                PayerPhone = u.PhoneNumber,
                 PayerUserId = u.Id,
                 PayerName = u.UserName,
                 PayerEmail = u.Email
