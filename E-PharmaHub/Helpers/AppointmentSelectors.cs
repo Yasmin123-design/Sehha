@@ -1,5 +1,6 @@
 ﻿using E_PharmaHub.Dtos;
 using E_PharmaHub.Models;
+using E_PharmaHub.Models.Enums;
 using System.Linq.Expressions;
 
 namespace E_PharmaHub.Helpers
@@ -11,26 +12,38 @@ namespace E_PharmaHub.Helpers
             return a => new AppointmentResponseDto
             {
                 Id = a.Id,
+
                 CreatedAt = a.CreatedAt,
+
                 ClinicId = a.ClinicId,
-                ClinicName = a.Clinic.Name,
+                ClinicName = a.Clinic != null ? a.Clinic.Name : "",
+                ClinicImage = a.Clinic != null ? a.Clinic.ImagePath : null,
+
                 AppointmentAmount = a.Doctor.DoctorProfile.ConsultationPrice,
-                ClinicImage = a.Clinic.ImagePath,
-                DoctorId = a.Doctor.DoctorProfile.Id,
-                DoctorAppUserId = a.Doctor.DoctorProfile.AppUserId,
-                DoctorName = a.Doctor.UserName,
+
+                DoctorId = a.Doctor.DoctorProfile != null
+                    ? a.Doctor.DoctorProfile.Id
+                    : 0,
+
+                DoctorAppUserId = a.Doctor.DoctorProfile != null
+                    ? a.Doctor.DoctorProfile.AppUserId
+                    : null,
+
+                DoctorName = a.Doctor != null ? a.Doctor.UserName : "",
                 DoctorImage = a.Doctor.ProfileImage,
-                DoctorSpeciality = a.Doctor.DoctorProfile.Specialty,
+
+                DoctorSpeciality = a.Doctor.DoctorProfile != null
+                    ? a.Doctor.DoctorProfile.Specialty : Speciality.GeneralMedicine,
                 UserId = a.UserId,
-                UserNameLogged = a.User.UserName,
+                UserNameLogged = a.User != null ? a.User.UserName : "",
                 UserImageLogged = a.User.ProfileImage,
                 PatientAge = a.PatientAge,
                 PatientPhone = a.PatientPhone,
                 PatientName = a.PatientName,
-                PatientGender = a.PatientGender,
-                EndAt = a.EndAt,
-                StartAt = a.StartAt,
-                Status = a.Status              
+                PatientGender = a.PatientGender ,
+                StartAt = a.StartAt ,
+                EndAt = a.EndAt ,
+                Status = a.Status 
             };
         }
 

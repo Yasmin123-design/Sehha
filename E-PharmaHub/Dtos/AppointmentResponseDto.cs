@@ -7,7 +7,7 @@ namespace E_PharmaHub.Dtos
         public int Id { get; set; }
         public int DoctorId { get; set; }
         public string? DoctorAppUserId { get; set; }
-        public DateTime CreatedAt { get; set; } 
+        public DateTime? CreatedAt { get; set; } 
         public decimal? AppointmentAmount { get; set; }
         public string DoctorName { get; set; }
         public Speciality DoctorSpeciality { get; set; }
@@ -19,8 +19,8 @@ namespace E_PharmaHub.Dtos
         public string ClinicName { get; set; }
         public string? ClinicImage { get; set; }
         public string PatientName { get; set; }
-        public string PatientPhone { get; set; }
-        public int PatientAge { get; set; }
+        public string? PatientPhone { get; set; }
+        public int? PatientAge { get; set; }
         public Gender PatientGender { get; set; }
         public DateTime StartAt { get; set; }
         public DateTime EndAt { get; set; }
