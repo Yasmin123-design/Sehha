@@ -15,6 +15,7 @@
         public string? Street { get; set; }
         public string? PhoneNumber { get; set; }
         public decimal TotalPrice { get; set; }
+        public decimal DelieveryFee { get; set; }
         public string Status { get; set; }
         public string PaymentStatus { get; set; }
         public DateTime CreatedAt { get; set; }
