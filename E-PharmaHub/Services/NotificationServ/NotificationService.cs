@@ -79,7 +79,7 @@ namespace E_PharmaHub.Services.NotificationServ
                 {
                     AppointmentRequests = notifications
                 };
-            }else if(role == "Pharmacist")
+            }else if(role == "Pharmacist" || role == "Admin")
             {
                 return new
                 {

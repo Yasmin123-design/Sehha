@@ -3,6 +3,7 @@ using E_PharmaHub.Services.AppointmentServ;
 using E_PharmaHub.Services.ClinicServ;
 using E_PharmaHub.Services.DoctorServ;
 using E_PharmaHub.Services.MedicineServ;
+using E_PharmaHub.Services.NotificationServ;
 using E_PharmaHub.Services.OrderServ;
 using E_PharmaHub.Services.PaymentServ;
 using E_PharmaHub.Services.PharmacistServ;
@@ -29,6 +30,7 @@ namespace E_PharmaHub.Controllers
         private readonly IOrderService _orderService;
         private readonly IUserService _userService;
         private readonly IPaymentService _paymentService;
+        private readonly INotificationService _notificationService;
         public AdminController(
             IDoctorService doctorService,
             IPharmacistService pharmacistService,
@@ -38,13 +40,15 @@ namespace E_PharmaHub.Controllers
             IAppointmentService appointmentService,
             IOrderService orderService,
             IUserService userService,
-            IPaymentService paymentService
+            IPaymentService paymentService,
+            INotificationService notificationService
             )
         {
             _doctorService = doctorService;
             _paymentService = paymentService;
             _pharmacistService = pharmacistService;
             _pharmacyService = pharmacyService;
+            _notificationService = notificationService;
             _clinicService = clinicService;
             _medicineService = medicineService;
             _appointmentService = appointmentService;
@@ -445,6 +449,17 @@ namespace E_PharmaHub.Controllers
         [HttpGet("payment/appointments")]
         public async Task<IActionResult> GetAppointmentsPayments()
             => Ok(await _paymentService.GetAppointmentPaymentsAsync());
+
+        [HttpGet("admin-notifications")]
+        public async Task<IActionResult> GetUserNotifications()
+        {
+            var adminId = await _userService.GetAdminUserIdAsync();
+
+            var result = await _notificationService
+                .GetUserNotificationsByCategoryAsync(adminId, "Admin");
+
+            return Ok(result);
+        }
         //[HttpDelete("deleteuser/{userId}")]
         //public async Task<IActionResult> DeleteUser(string userId)
         //{
