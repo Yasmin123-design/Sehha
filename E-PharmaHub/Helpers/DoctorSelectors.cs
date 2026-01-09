@@ -16,6 +16,7 @@ namespace E_PharmaHub.Helpers
             {
                 Id = d.Id,
                 Email = d.AppUser.Email,
+                CreatedAt = d.CreatedAt,
                 UserId = d.AppUser.Id,
                 Specialty = d.Specialty,
                 IsApproved = d.IsApproved,

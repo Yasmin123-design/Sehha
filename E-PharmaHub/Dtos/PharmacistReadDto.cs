@@ -5,6 +5,7 @@
         public int Id { get; set; }
         public string Email { get; set; }
         public string? UserId { get; set; }
+        public DateTime CreatedAt { get; set; }
         public string? UserName { get; set; }
         public string? PharmacistImage { get; set; }
         public string LicenseNumber { get; set; }

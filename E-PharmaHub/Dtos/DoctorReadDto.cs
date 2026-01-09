@@ -6,6 +6,7 @@ namespace E_PharmaHub.Dtos
     {
         public int Id { get; set; }
         public string Email { get; set; }
+        public DateTime CreatedAt { get; set; } 
         public Speciality Specialty { get; set; }
         public bool IsRejected { get; set; }
         public bool IsApproved { get; set; }
