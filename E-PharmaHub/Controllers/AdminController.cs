@@ -460,6 +460,48 @@ namespace E_PharmaHub.Controllers
 
             return Ok(result);
         }
+
+        [HttpGet("profile")]
+
+        public async Task<IActionResult> GetProfile()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var profile = await _userService.GetUserProfileAsync(userId);
+
+            if (profile == null)
+                return NotFound(new { message = "User not found ❌" });
+
+            return Ok(profile);
+        }
+
+        [HttpPut("update-profile")]
+        public async Task<IActionResult> UpdateProfile([FromForm] UserProfileDto dto)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var (success, message) = await _userService.UpdateProfileAsync(userId, dto);
+
+            if (!success)
+                return BadRequest(new { message });
+
+            return Ok(new { message });
+        }
+
+        [HttpPut("update-password")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> UpdatePassword([FromBody] UserPasswordUpdateDto dto)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var (success, message) = await _userService.UpdatePasswordAsync(userId, dto);
+
+            if (!success)
+                return BadRequest(new { message });
+
+            return Ok(new { message });
+        }
+
+
+
+
         //[HttpDelete("deleteuser/{userId}")]
         //public async Task<IActionResult> DeleteUser(string userId)
         //{
