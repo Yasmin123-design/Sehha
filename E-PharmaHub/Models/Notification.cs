@@ -9,7 +9,7 @@ namespace E_PharmaHub.Models
         public string Title { get; set; }
         public string Message { get; set; }
         public NotificationType Type { get; set; }
-        public AppUser User { get; set; }
+        public AppUser? User { get; set; }
         public bool IsRead { get; set; } = false;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
