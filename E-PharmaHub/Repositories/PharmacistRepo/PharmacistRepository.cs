@@ -20,7 +20,8 @@ namespace E_PharmaHub.Repositories.PharmacistRepo
                 .AsNoTracking()
                 .Include(p => p.AppUser)
                 .Include(p => p.Pharmacy)
-                .ThenInclude(ph => ph.Address);
+                .ThenInclude(ph => ph.Address)
+                .OrderByDescending(c => c.CreatedAt);
         }
 
         public async Task<IEnumerable<PharmacistProfile>> GetAllAsync()

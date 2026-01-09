@@ -18,7 +18,7 @@ namespace E_PharmaHub.Models
         public bool IsApproved { get; set; } = false;
         public bool IsRejected { get; set; } = false;
         public bool HasPaid { get; set; } = false;
-
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public virtual Clinic? Clinic { get; set; }
         public string? AppUserId { get; set; }
         public virtual AppUser? AppUser { get; set; }

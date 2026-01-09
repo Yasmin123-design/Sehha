@@ -23,7 +23,8 @@ namespace E_PharmaHub.Repositories.DoctorRepo
                 .Include(d => d.Clinic)
                     .ThenInclude(c => c.Address)
                 .Include(d => d.Reviews)
-                .AsNoTracking();
+                .AsNoTracking()
+                .OrderByDescending(c => c.CreatedAt);
         }
         public async Task<IEnumerable<DoctorAvailability>> GetByDoctorAndDayAsync(
     int doctorId,

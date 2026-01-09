@@ -11,6 +11,7 @@ namespace E_PharmaHub.Models
         public bool IsRejected { get; set; } = false;
         public bool HasPaid { get; set; } = false;
         public string? AppUserId { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         [Required(ErrorMessage = "License number is required.")]
         [StringLength(50, ErrorMessage = "License number cannot exceed 50 characters.")]
