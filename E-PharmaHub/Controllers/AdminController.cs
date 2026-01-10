@@ -543,5 +543,19 @@ namespace E_PharmaHub.Controllers
             var report = await _adminDashboardService.GetDailyRegistrationCountReportAsync(month, year);
             return Ok(report);
         }
+
+        [HttpGet("daily-orders-report")]
+        public async Task<IActionResult> GetDailyOrdersReport([FromQuery] int? month, [FromQuery] int? year)
+        {
+            var report = await _adminDashboardService.GetDailyOrdersReportAsync(month, year);
+            return Ok(report);
+        }
+
+        [HttpGet("daily-appointments-report")]
+        public async Task<IActionResult> GetDailyAppointmentsReport([FromQuery] int? month, [FromQuery] int? year)
+        {
+            var report = await _adminDashboardService.GetDailyAppointmentsReportAsync(month, year);
+            return Ok(report);
+        }
     }
 }

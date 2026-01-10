@@ -56,4 +56,24 @@ namespace E_PharmaHub.Dtos
         public int PharmacistCount { get; set; }
         public int TotalCount { get; set; }
     }
+
+    public class DailyOrdersReportDto
+    {
+        public DateTime Date { get; set; }
+        public int PendingCount { get; set; }
+        public int ConfirmedCount { get; set; }
+        public int DeliveredCount { get; set; }
+        public int CancelledCount { get; set; }
+        public int TotalCount { get; set; }
+    }
+
+    public class DailyAppointmentsReportDto
+    {
+        public DateTime Date { get; set; }
+        public int PendingCount { get; set; }
+        public int ConfirmedCount { get; set; }
+        public int CompletedCount { get; set; }
+        public int CancelledCount { get; set; }
+        public int TotalCount { get; set; }
+    }
 }

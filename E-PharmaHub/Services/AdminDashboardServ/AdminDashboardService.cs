@@ -43,13 +43,16 @@ namespace E_PharmaHub.Services.AdminDashboardServ
 
             var result = new AdminTopPerformersDto();
 
+            // Paid Payment IDs (using PaymentIntentId)
+            var paidPaymentIds = payments.Where(p => !string.IsNullOrEmpty(p.PaymentIntentId)).Select(p => (int?)p.Id).ToHashSet();
+
             result.TopDoctors = doctors
                 .Select(d =>
                 {
                     var doctorAppointments = appointments.Where(a => a.DoctorId == d.AppUserId);
                     var validAppointments = doctorAppointments.Where(a =>
                         (a.Status == AppointmentStatus.Confirmed || a.Status == AppointmentStatus.Completed) &&
-                        payments.Any(p => p.Id == a.PaymentId && p.Status == PaymentStatus.Paid)
+                        paidPaymentIds.Contains(a.PaymentId)
                     );
 
                     decimal revenue = 0;
@@ -76,7 +79,7 @@ namespace E_PharmaHub.Services.AdminDashboardServ
                     var pharmacyOrders = orders.Where(o => o.PharmacyId == p.PharmacyId);
                     var validOrders = pharmacyOrders.Where(o =>
                         (o.Status != OrderStatus.Cancelled && o.Status != OrderStatus.Returned && o.Status != OrderStatus.Pending) &&
-                        o.PaymentStatus == PaymentStatus.Paid
+                        paidPaymentIds.Contains(o.PaymentId)
                     );
 
                     return new PharmacistRevenueDto
@@ -98,7 +101,7 @@ namespace E_PharmaHub.Services.AdminDashboardServ
             var payments = await _unitOfWork.Payments.GetAllAsync();
 
             var query = payments
-                .Where(p => p.Status == PaymentStatus.Paid &&
+                .Where(p => !string.IsNullOrEmpty(p.PaymentIntentId) &&
                            (p.PaymentFor == PaymentForType.DoctorRegistration || p.PaymentFor == PaymentForType.PharmacistRegistration));
 
             if (year.HasValue)
@@ -172,6 +175,70 @@ namespace E_PharmaHub.Services.AdminDashboardServ
             return report;
         }
 
+        public async Task<IEnumerable<DailyOrdersReportDto>> GetDailyOrdersReportAsync(int? month, int? year)
+        {
+            var orders = await _unitOfWork.Order.GetAllEntitiesAsync();
+            var payments = await _unitOfWork.Payments.GetAllAsync();
+
+            var paidPaymentIds = payments.Where(p => !string.IsNullOrEmpty(p.PaymentIntentId)).Select(p => (int?)p.Id).ToHashSet();
+
+            var query = orders.Where(o => paidPaymentIds.Contains(o.PaymentId));
+
+            if (year.HasValue)
+                query = query.Where(o => o.CreatedAt.ToEgyptTime().Year == year.Value);
+
+            if (month.HasValue)
+                query = query.Where(o => o.CreatedAt.ToEgyptTime().Month == month.Value);
+
+            var report = query
+                .GroupBy(o => o.CreatedAt.ToEgyptTime().Date)
+                .Select(g => new DailyOrdersReportDto
+                {
+                    Date = g.Key,
+                    PendingCount = g.Count(o => o.Status == OrderStatus.Pending),
+                    ConfirmedCount = g.Count(o => o.Status == OrderStatus.Confirmed),
+                    DeliveredCount = g.Count(o => o.Status == OrderStatus.Delivered),
+                    CancelledCount = g.Count(o => o.Status == OrderStatus.Cancelled),
+                    TotalCount = g.Count()
+                })
+                .OrderBy(r => r.Date)
+                .ToList();
+
+            return report;
+        }
+
+        public async Task<IEnumerable<DailyAppointmentsReportDto>> GetDailyAppointmentsReportAsync(int? month, int? year)
+        {
+            var appointments = await _unitOfWork.Appointments.GetAllAsync();
+            var payments = await _unitOfWork.Payments.GetAllAsync();
+
+            var paidPaymentIds = payments.Where(p => !string.IsNullOrEmpty(p.PaymentIntentId)).Select(p => (int?)p.Id).ToHashSet();
+
+            var query = appointments.Where(a => paidPaymentIds.Contains(a.PaymentId));
+
+            if (year.HasValue)
+                query = query.Where(a => a.CreatedAt.ToEgyptTime().Year == year.Value);
+
+            if (month.HasValue)
+                query = query.Where(a => a.CreatedAt.ToEgyptTime().Month == month.Value);
+
+            var report = query
+                .GroupBy(a => a.CreatedAt.ToEgyptTime().Date)
+                .Select(g => new DailyAppointmentsReportDto
+                {
+                    Date = g.Key,
+                    PendingCount = g.Count(a => a.Status == AppointmentStatus.Pending),
+                    ConfirmedCount = g.Count(a => a.Status == AppointmentStatus.Confirmed),
+                    CompletedCount = g.Count(a => a.Status == AppointmentStatus.Completed),
+                    CancelledCount = g.Count(a => a.Status == AppointmentStatus.Cancelled),
+                    TotalCount = g.Count()
+                })
+                .OrderBy(r => r.Date)
+                .ToList();
+
+            return report;
+        }
+
         private AdminStats CalculateStats(
             IEnumerable<E_PharmaHub.Models.Payment> payments,
             IEnumerable<E_PharmaHub.Models.DoctorProfile> doctors,
@@ -180,7 +247,7 @@ namespace E_PharmaHub.Services.AdminDashboardServ
         {
             var stats = new AdminStats();
 
-            var regPayments = payments.Where(p => p.ProcessedAt.ToEgyptTime().Date == date.Date && p.Status == PaymentStatus.Paid);
+            var regPayments = payments.Where(p => p.ProcessedAt.ToEgyptTime().Date == date.Date && !string.IsNullOrEmpty(p.PaymentIntentId));
 
             stats.DoctorRegistrationRevenue = regPayments
                 .Where(p => p.PaymentFor == PaymentForType.DoctorRegistration)
