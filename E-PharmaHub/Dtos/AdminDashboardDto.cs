@@ -20,4 +20,24 @@ namespace E_PharmaHub.Dtos
         public int ApprovedRegistrations { get; set; }
         public int RejectedRegistrations { get; set; }
     }
+
+    public class AdminTopPerformersDto
+    {
+        public List<DoctorRevenueDto> TopDoctors { get; set; } = new();
+        public List<PharmacistRevenueDto> TopPharmacists { get; set; } = new();
+    }
+
+    public class DoctorRevenueDto
+    {
+        public string FullName { get; set; }
+        public string Email { get; set; }
+        public decimal TotalRevenue { get; set; }
+    }
+
+    public class PharmacistRevenueDto
+    {
+        public string FullName { get; set; }
+        public string Email { get; set; }
+        public decimal TotalRevenue { get; set; }
+    }
 }

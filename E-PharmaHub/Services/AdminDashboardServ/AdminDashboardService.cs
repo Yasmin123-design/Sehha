@@ -33,6 +33,67 @@ namespace E_PharmaHub.Services.AdminDashboardServ
             return result;
         }
 
+        public async Task<AdminTopPerformersDto> GetTopPerformingEntitiesAsync()
+        {
+            var payments = await _unitOfWork.Payments.GetAllAsync();
+            var doctors = await _unitOfWork.Doctors.GetAllAsync();
+            var pharmacists = await _unitOfWork.PharmasistsProfile.GetAllAsync();
+            var orders = await _unitOfWork.Order.GetAllEntitiesAsync();
+            var appointments = await _unitOfWork.Appointments.GetAllAsync();
+
+            var result = new AdminTopPerformersDto();
+
+            // Top 5 Doctors based on Appointment revenue
+            result.TopDoctors = doctors
+                .Select(d =>
+                {
+                    var doctorAppointments = appointments.Where(a => a.DoctorId == d.AppUserId);
+                    var validAppointments = doctorAppointments.Where(a =>
+                        (a.Status == AppointmentStatus.Confirmed || a.Status == AppointmentStatus.Completed) &&
+                        payments.Any(p => p.Id == a.PaymentId && p.Status == PaymentStatus.Paid)
+                    );
+
+                    decimal revenue = 0;
+                    foreach (var app in validAppointments)
+                    {
+                        var pay = payments.FirstOrDefault(p => p.Id == app.PaymentId);
+                        if (pay != null) revenue += pay.Amount;
+                    }
+
+                    return new DoctorRevenueDto
+                    {
+                        FullName = d.AppUser?.UserName ?? "Unknown",
+                        Email = d.AppUser?.Email ?? "N/A",
+                        TotalRevenue = revenue
+                    };
+                })
+                .OrderByDescending(d => d.TotalRevenue)
+                .Take(5)
+                .ToList();
+
+            result.TopPharmacists = pharmacists
+                .Select(p =>
+                {
+                    var pharmacyOrders = orders.Where(o => o.PharmacyId == p.PharmacyId);
+                    var validOrders = pharmacyOrders.Where(o =>
+                        (o.Status != OrderStatus.Cancelled && o.Status != OrderStatus.Returned && o.Status != OrderStatus.Pending) &&
+                        o.PaymentStatus == PaymentStatus.Paid
+                    );
+
+                    return new PharmacistRevenueDto
+                    {
+                        FullName = p.AppUser?.UserName ?? "Unknown",
+                        Email = p.AppUser?.Email ?? "N/A",
+                        TotalRevenue = validOrders.Sum(o => o.TotalPrice)
+                    };
+                })
+                .OrderByDescending(p => p.TotalRevenue)
+                .Take(5)
+                .ToList();
+
+            return result;
+        }
+
         private AdminStats CalculateStats(
             IEnumerable<E_PharmaHub.Models.Payment> payments,
             IEnumerable<E_PharmaHub.Models.DoctorProfile> doctors,

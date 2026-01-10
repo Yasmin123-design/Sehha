@@ -522,6 +522,12 @@ namespace E_PharmaHub.Controllers
             var stats = await _adminDashboardService.GetAdminDashboardStatsAsync();
             return Ok(stats);
         }
-    }
 
+        [HttpGet("top-performers")]
+        public async Task<IActionResult> GetTopPerformers()
+        {
+            var result = await _adminDashboardService.GetTopPerformingEntitiesAsync();
+            return Ok(result);
+        }
+    }
 }
