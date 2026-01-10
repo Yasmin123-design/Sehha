@@ -91,5 +91,10 @@ namespace E_PharmaHub.Repositories.PaymentRepo
         {
             return await _context.Payments.FirstOrDefaultAsync(p => p.ProviderTransactionId == sessionId);
         }
+
+        public async Task<IEnumerable<Payment>> GetAllAsync()
+        {
+            return await _context.Payments.AsNoTracking().ToListAsync();
+        }
     }
 }

@@ -65,6 +65,7 @@ using E_PharmaHub.Repositories.PrescriptionItemRepo;
 using E_PharmaHub.Services.DoctorAnalyticsServ;
 using E_PharmaHub.Services.PharmacistAnalyticsServ;
 using E_PharmaHub.Repositories.OrderItemRepo;
+using E_PharmaHub.Services.AdminDashboardServ;
 
 namespace E_PharmaHub
 {
@@ -231,6 +232,7 @@ namespace E_PharmaHub
             builder.Services.AddSingleton<IUserIdProvider, NameUserIdProvider>();
             builder.Services.AddScoped<IDoctorAnalyticsService, DoctorAnalyticsService>();
             builder.Services.AddScoped<IPharmacistDashboardService, PharmacistDashboardService>();
+            builder.Services.AddScoped<IAdminDashboardService, AdminDashboardService>();
             builder.Services.AddScoped<IOrderItemRepository, OrderItemRepository>();
 
             builder.Services.AddHttpContextAccessor();

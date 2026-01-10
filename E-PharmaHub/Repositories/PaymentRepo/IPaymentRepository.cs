@@ -17,7 +17,6 @@ namespace E_PharmaHub.Repositories.PaymentRepo
         Task<Payment> GetByIdAsync(int id);
         Task MarkAsSuccess(string sessionId);
         Task<Payment> GetByProviderTransactionIdAsync(string providerTransactionId);
-
-
+        Task<IEnumerable<Payment>> GetAllAsync();
     }
 }

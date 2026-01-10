@@ -411,6 +411,11 @@ namespace E_PharmaHub.Repositories.OrderRepo
 
             return await query.FirstOrDefaultAsync();
         }
+
+        public async Task<IEnumerable<Order>> GetAllEntitiesAsync()
+        {
+            return await _context.Orders.AsNoTracking().ToListAsync();
+        }
     }
 
 }

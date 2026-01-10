@@ -9,6 +9,7 @@ using E_PharmaHub.Services.PaymentServ;
 using E_PharmaHub.Services.PharmacistServ;
 using E_PharmaHub.Services.PharmacyServ;
 using E_PharmaHub.Services.UserServ;
+using E_PharmaHub.Services.AdminDashboardServ;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -31,6 +32,7 @@ namespace E_PharmaHub.Controllers
         private readonly IUserService _userService;
         private readonly IPaymentService _paymentService;
         private readonly INotificationService _notificationService;
+        private readonly IAdminDashboardService _adminDashboardService;
         public AdminController(
             IDoctorService doctorService,
             IPharmacistService pharmacistService,
@@ -41,7 +43,8 @@ namespace E_PharmaHub.Controllers
             IOrderService orderService,
             IUserService userService,
             IPaymentService paymentService,
-            INotificationService notificationService
+            INotificationService notificationService,
+            IAdminDashboardService adminDashboardService
             )
         {
             _doctorService = doctorService;
@@ -54,6 +57,7 @@ namespace E_PharmaHub.Controllers
             _appointmentService = appointmentService;
             _orderService = orderService;
             _userService = userService;
+            _adminDashboardService = adminDashboardService;
         }
         [HttpGet("allDoctorsShowToAdmin")]
         public async Task<IActionResult> GetAllDoctorsShowToAdmin()
@@ -512,6 +516,12 @@ namespace E_PharmaHub.Controllers
 
         //    return Ok("User deleted successfully");
         //}
+        [HttpGet("dashboard-stats")]
+        public async Task<IActionResult> GetDashboardStats()
+        {
+            var stats = await _adminDashboardService.GetAdminDashboardStatsAsync();
+            return Ok(stats);
+        }
     }
 
 }

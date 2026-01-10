@@ -44,7 +44,6 @@ namespace E_PharmaHub.Repositories.OrderRepo
         Task UpdateAsync(Order order);
         Task<OrderResponseDto?> GetPendingOrderByUserAsync(string userId, int pharmacyId);
         Task<OrderResponseDto?> GetByPaymentIdAsync(int paymentId);
-
-
+        Task<IEnumerable<Order>> GetAllEntitiesAsync();
     }
 }
