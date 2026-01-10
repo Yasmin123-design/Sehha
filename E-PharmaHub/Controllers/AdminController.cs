@@ -557,5 +557,12 @@ namespace E_PharmaHub.Controllers
             var report = await _adminDashboardService.GetDailyAppointmentsReportAsync(month, year);
             return Ok(report);
         }
+
+        [HttpGet("specialty-doctor-count-report")]
+        public async Task<IActionResult> GetSpecialtyDoctorCountReport()
+        {
+            var report = await _adminDashboardService.GetSpecialtyDoctorCountReportAsync();
+            return Ok(report);
+        }
     }
 }

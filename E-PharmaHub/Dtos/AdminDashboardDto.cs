@@ -76,4 +76,10 @@ namespace E_PharmaHub.Dtos
         public int CancelledCount { get; set; }
         public int TotalCount { get; set; }
     }
+
+    public class SpecialtyDoctorCountDto
+    {
+        public string SpecialtyName { get; set; }
+        public int DoctorCount { get; set; }
+    }
 }

@@ -239,6 +239,31 @@ namespace E_PharmaHub.Services.AdminDashboardServ
             return report;
         }
 
+        public async Task<IEnumerable<SpecialtyDoctorCountDto>> GetSpecialtyDoctorCountReportAsync()
+        {
+            var doctors = await _unitOfWork.Doctors.GetAllAsync();
+            var payments = await _unitOfWork.Payments.GetAllAsync();
+
+            var usersWithPayment = payments
+                .Where(p => !string.IsNullOrEmpty(p.PaymentIntentId))
+                .Select(p => p.ReferenceId)
+                .ToHashSet();
+
+            var validDoctors = doctors
+                .Where(d => !string.IsNullOrEmpty(d.AppUserId) && usersWithPayment.Contains(d.AppUserId))
+                .ToList();
+
+            var specialties = Enum.GetValues(typeof(Speciality)).Cast<Speciality>();
+
+            var report = specialties.Select(s => new SpecialtyDoctorCountDto
+            {
+                SpecialtyName = s.ToString(),
+                DoctorCount = validDoctors.Count(d => d.Specialty == s)
+            }).ToList();
+
+            return report;
+        }
+
         private AdminStats CalculateStats(
             IEnumerable<E_PharmaHub.Models.Payment> payments,
             IEnumerable<E_PharmaHub.Models.DoctorProfile> doctors,
