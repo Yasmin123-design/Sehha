@@ -82,4 +82,13 @@ namespace E_PharmaHub.Dtos
         public string SpecialtyName { get; set; }
         public int DoctorCount { get; set; }
     }
+
+    public class DailyRegistrationStatusReportDto
+    {
+        public DateTime Date { get; set; }
+        public int PendingCount { get; set; }
+        public int ApprovedCount { get; set; }
+        public int RejectedCount { get; set; }
+        public int TotalCount { get; set; }
+    }
 }

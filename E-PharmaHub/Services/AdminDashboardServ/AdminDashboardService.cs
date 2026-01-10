@@ -264,6 +264,74 @@ namespace E_PharmaHub.Services.AdminDashboardServ
             return report;
         }
 
+        public async Task<IEnumerable<DailyRegistrationStatusReportDto>> GetDailyDoctorRegistrationStatusReportAsync(int? month, int? year)
+        {
+            var doctors = await _unitOfWork.Doctors.GetAllAsync();
+            var payments = await _unitOfWork.Payments.GetAllAsync();
+
+            var usersWithPayment = payments
+                .Where(p => !string.IsNullOrEmpty(p.PaymentIntentId))
+                .Select(p => p.ReferenceId)
+                .ToHashSet();
+
+            var validDoctors = doctors.Where(d => !string.IsNullOrEmpty(d.AppUserId) && usersWithPayment.Contains(d.AppUserId));
+
+            if (year.HasValue)
+                validDoctors = validDoctors.Where(d => d.CreatedAt.ToEgyptTime().Year == year.Value);
+
+            if (month.HasValue)
+                validDoctors = validDoctors.Where(d => d.CreatedAt.ToEgyptTime().Month == month.Value);
+
+            var report = validDoctors
+                .GroupBy(d => d.CreatedAt.ToEgyptTime().Date)
+                .Select(g => new DailyRegistrationStatusReportDto
+                {
+                    Date = g.Key,
+                    PendingCount = g.Count(d => !d.IsApproved && !d.IsRejected),
+                    ApprovedCount = g.Count(d => d.IsApproved),
+                    RejectedCount = g.Count(d => d.IsRejected),
+                    TotalCount = g.Count()
+                })
+                .OrderBy(r => r.Date)
+                .ToList();
+
+            return report;
+        }
+
+        public async Task<IEnumerable<DailyRegistrationStatusReportDto>> GetDailyPharmacistRegistrationStatusReportAsync(int? month, int? year)
+        {
+            var pharmacists = await _unitOfWork.PharmasistsProfile.GetAllAsync();
+            var payments = await _unitOfWork.Payments.GetAllAsync();
+
+            var usersWithPayment = payments
+                .Where(p => !string.IsNullOrEmpty(p.PaymentIntentId))
+                .Select(p => p.ReferenceId)
+                .ToHashSet();
+
+            var validPharmacists = pharmacists.Where(p => !string.IsNullOrEmpty(p.AppUserId) && usersWithPayment.Contains(p.AppUserId));
+
+            if (year.HasValue)
+                validPharmacists = validPharmacists.Where(p => p.CreatedAt.ToEgyptTime().Year == year.Value);
+
+            if (month.HasValue)
+                validPharmacists = validPharmacists.Where(p => p.CreatedAt.ToEgyptTime().Month == month.Value);
+
+            var report = validPharmacists
+                .GroupBy(p => p.CreatedAt.ToEgyptTime().Date)
+                .Select(g => new DailyRegistrationStatusReportDto
+                {
+                    Date = g.Key,
+                    PendingCount = g.Count(p => !p.IsApproved && !p.IsRejected),
+                    ApprovedCount = g.Count(p => p.IsApproved),
+                    RejectedCount = g.Count(p => p.IsRejected),
+                    TotalCount = g.Count()
+                })
+                .OrderBy(r => r.Date)
+                .ToList();
+
+            return report;
+        }
+
         private AdminStats CalculateStats(
             IEnumerable<E_PharmaHub.Models.Payment> payments,
             IEnumerable<E_PharmaHub.Models.DoctorProfile> doctors,
