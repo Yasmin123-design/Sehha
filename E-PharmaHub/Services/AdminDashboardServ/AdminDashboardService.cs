@@ -348,7 +348,7 @@ namespace E_PharmaHub.Services.AdminDashboardServ
 
                 TotalApprovedDoctors = doctors.Count(d => d.IsApproved),
                 TotalApprovedPharmacists = pharmacists.Count(p => p.IsApproved),
-                TotalRegisteredUsers = users.Count()
+                TotalRegisteredUsers = users.Where(x => x.Role == UserRole.RegularUser).Count()
             };
 
             return result;
