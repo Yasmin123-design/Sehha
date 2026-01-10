@@ -1,4 +1,4 @@
-using E_PharmaHub.Dtos;
+﻿using E_PharmaHub.Dtos;
 using E_PharmaHub.Helpers;
 using E_PharmaHub.Models.Enums;
 using E_PharmaHub.UnitOfWorkes;
@@ -42,7 +42,7 @@ namespace E_PharmaHub.Services.AdminDashboardServ
             var stats = new AdminStats();
 
             var regPayments = payments.Where(p => p.ProcessedAt.ToEgyptTime().Date == date.Date && p.Status == PaymentStatus.Paid);
-            
+
             stats.DoctorRegistrationRevenue = regPayments
                 .Where(p => p.PaymentFor == PaymentForType.DoctorRegistration)
                 .Sum(p => p.Amount);
@@ -53,8 +53,20 @@ namespace E_PharmaHub.Services.AdminDashboardServ
 
             stats.TotalRevenue = stats.DoctorRegistrationRevenue + stats.PharmacistRegistrationRevenue;
 
-            var dayDoctors = doctors.Where(d => d.CreatedAt.ToEgyptTime().Date == date.Date);
-            var dayPharmacists = pharmacists.Where(p => p.CreatedAt.ToEgyptTime().Date == date.Date);
+            var usersWithPayment = payments
+                .Where(p => !string.IsNullOrEmpty(p.PaymentIntentId))
+                .Select(p => p.ReferenceId)
+                .ToHashSet();
+
+            var dayDoctors = doctors.Where(d =>
+                d.CreatedAt.ToEgyptTime().Date == date.Date &&
+                !string.IsNullOrEmpty(d.AppUserId) &&
+                usersWithPayment.Contains(d.AppUserId));
+
+            var dayPharmacists = pharmacists.Where(p =>
+                p.CreatedAt.ToEgyptTime().Date == date.Date &&
+                !string.IsNullOrEmpty(p.AppUserId) &&
+                usersWithPayment.Contains(p.AppUserId));
 
             stats.DoctorRegistrations = dayDoctors.Count();
             stats.PharmacistRegistrations = dayPharmacists.Count();
