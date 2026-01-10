@@ -43,7 +43,6 @@ namespace E_PharmaHub.Services.AdminDashboardServ
 
             var result = new AdminTopPerformersDto();
 
-            // Top 5 Doctors based on Appointment revenue
             result.TopDoctors = doctors
                 .Select(d =>
                 {
@@ -92,6 +91,85 @@ namespace E_PharmaHub.Services.AdminDashboardServ
                 .ToList();
 
             return result;
+        }
+
+        public async Task<IEnumerable<DailyRevenueReportDto>> GetDailyRevenueReportAsync(int? month, int? year)
+        {
+            var payments = await _unitOfWork.Payments.GetAllAsync();
+
+            var query = payments
+                .Where(p => p.Status == PaymentStatus.Paid &&
+                           (p.PaymentFor == PaymentForType.DoctorRegistration || p.PaymentFor == PaymentForType.PharmacistRegistration));
+
+            if (year.HasValue)
+                query = query.Where(p => p.ProcessedAt.ToEgyptTime().Year == year.Value);
+
+            if (month.HasValue)
+                query = query.Where(p => p.ProcessedAt.ToEgyptTime().Month == month.Value);
+
+            var report = query
+                .GroupBy(p => p.ProcessedAt.ToEgyptTime().Date)
+                .Select(g => new DailyRevenueReportDto
+                {
+                    Date = g.Key,
+                    DoctorRevenue = g.Where(p => p.PaymentFor == PaymentForType.DoctorRegistration).Sum(p => p.Amount),
+                    PharmacistRevenue = g.Where(p => p.PaymentFor == PaymentForType.PharmacistRegistration).Sum(p => p.Amount),
+                    TotalRevenue = g.Sum(p => p.Amount)
+                })
+                .OrderBy(r => r.Date)
+                .ToList();
+
+            return report;
+        }
+
+        public async Task<IEnumerable<DailyCountReportDto>> GetDailyRegistrationCountReportAsync(int? month, int? year)
+        {
+            var payments = await _unitOfWork.Payments.GetAllAsync();
+            var doctors = await _unitOfWork.Doctors.GetAllAsync();
+            var pharmacists = await _unitOfWork.PharmasistsProfile.GetAllAsync();
+
+            var usersWithPayment = payments
+                .Where(p => !string.IsNullOrEmpty(p.PaymentIntentId))
+                .Select(p => p.ReferenceId)
+                .ToHashSet();
+
+            var validDoctors = doctors.Where(d => !string.IsNullOrEmpty(d.AppUserId) && usersWithPayment.Contains(d.AppUserId));
+            var validPharmacists = pharmacists.Where(p => !string.IsNullOrEmpty(p.AppUserId) && usersWithPayment.Contains(p.AppUserId));
+
+            if (year.HasValue)
+            {
+                validDoctors = validDoctors.Where(d => d.CreatedAt.ToEgyptTime().Year == year.Value);
+                validPharmacists = validPharmacists.Where(p => p.CreatedAt.ToEgyptTime().Year == year.Value);
+            }
+
+            if (month.HasValue)
+            {
+                validDoctors = validDoctors.Where(d => d.CreatedAt.ToEgyptTime().Month == month.Value);
+                validPharmacists = validPharmacists.Where(p => p.CreatedAt.ToEgyptTime().Month == month.Value);
+            }
+
+            var doctorGroups = validDoctors
+                .GroupBy(d => d.CreatedAt.ToEgyptTime().Date)
+                .Select(g => new { Date = g.Key, Count = g.Count() });
+
+            var pharmacistGroups = validPharmacists
+                .GroupBy(p => p.CreatedAt.ToEgyptTime().Date)
+                .Select(g => new { Date = g.Key, Count = g.Count() });
+
+            var allDates = doctorGroups.Select(g => g.Date)
+                .Union(pharmacistGroups.Select(g => g.Date))
+                .OrderBy(d => d);
+
+            var report = allDates.Select(date => new DailyCountReportDto
+            {
+                Date = date,
+                DoctorCount = doctorGroups.FirstOrDefault(g => g.Date == date)?.Count ?? 0,
+                PharmacistCount = pharmacistGroups.FirstOrDefault(g => g.Date == date)?.Count ?? 0,
+                TotalCount = (doctorGroups.FirstOrDefault(g => g.Date == date)?.Count ?? 0) +
+                             (pharmacistGroups.FirstOrDefault(g => g.Date == date)?.Count ?? 0)
+            }).ToList();
+
+            return report;
         }
 
         private AdminStats CalculateStats(

@@ -40,4 +40,20 @@ namespace E_PharmaHub.Dtos
         public string Email { get; set; }
         public decimal TotalRevenue { get; set; }
     }
+
+    public class DailyRevenueReportDto
+    {
+        public DateTime Date { get; set; }
+        public decimal DoctorRevenue { get; set; }
+        public decimal PharmacistRevenue { get; set; }
+        public decimal TotalRevenue { get; set; }
+    }
+
+    public class DailyCountReportDto
+    {
+        public DateTime Date { get; set; }
+        public int DoctorCount { get; set; }
+        public int PharmacistCount { get; set; }
+        public int TotalCount { get; set; }
+    }
 }

@@ -6,5 +6,7 @@ namespace E_PharmaHub.Services.AdminDashboardServ
     {
         Task<AdminDashboardDto> GetAdminDashboardStatsAsync();
         Task<AdminTopPerformersDto> GetTopPerformingEntitiesAsync();
+        Task<IEnumerable<DailyRevenueReportDto>> GetDailyRevenueReportAsync(int? month, int? year);
+        Task<IEnumerable<DailyCountReportDto>> GetDailyRegistrationCountReportAsync(int? month, int? year);
     }
 }
