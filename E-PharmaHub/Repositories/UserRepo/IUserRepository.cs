@@ -5,6 +5,7 @@ namespace E_PharmaHub.Repositories.UserRepo
     public interface IUserRepository
     {
         Task<AppUser?> GetByIdAsync(string userId);
+        Task<IEnumerable<AppUser>> GetAllAsync();
         void Update(AppUser user);
         void Delete(AppUser user);
     }

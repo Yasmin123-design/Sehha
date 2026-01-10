@@ -13,5 +13,6 @@ namespace E_PharmaHub.Services.AdminDashboardServ
         Task<IEnumerable<SpecialtyDoctorCountDto>> GetSpecialtyDoctorCountReportAsync();
         Task<IEnumerable<DailyRegistrationStatusReportDto>> GetDailyDoctorRegistrationStatusReportAsync(int? month, int? year);
         Task<IEnumerable<DailyRegistrationStatusReportDto>> GetDailyPharmacistRegistrationStatusReportAsync(int? month, int? year);
+        Task<AdminOverviewDto> GetAdminOverviewAsync();
     }
 }

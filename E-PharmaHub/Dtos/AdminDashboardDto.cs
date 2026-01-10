@@ -91,4 +91,12 @@ namespace E_PharmaHub.Dtos
         public int RejectedCount { get; set; }
         public int TotalCount { get; set; }
     }
+
+    public class AdminOverviewDto
+    {
+        public decimal TotalRegistrationRevenue { get; set; }
+        public int TotalApprovedDoctors { get; set; }
+        public int TotalApprovedPharmacists { get; set; }
+        public int TotalRegisteredUsers { get; set; }
+    }
 }

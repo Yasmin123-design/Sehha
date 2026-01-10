@@ -578,5 +578,12 @@ namespace E_PharmaHub.Controllers
             var report = await _adminDashboardService.GetDailyPharmacistRegistrationStatusReportAsync(month, year);
             return Ok(report);
         }
+
+        [HttpGet("admin-overview")]
+        public async Task<IActionResult> GetAdminOverview()
+        {
+            var result = await _adminDashboardService.GetAdminOverviewAsync();
+            return Ok(result);
+        }
     }
 }

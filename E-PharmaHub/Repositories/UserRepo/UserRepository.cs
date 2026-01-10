@@ -17,6 +17,11 @@ namespace E_PharmaHub.Repositories.UserRepo
             return await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
         }
 
+        public async Task<IEnumerable<AppUser>> GetAllAsync()
+        {
+            return await _context.Users.ToListAsync();
+        }
+
         public void Update(AppUser user)
         {
             _context.Users.Update(user);

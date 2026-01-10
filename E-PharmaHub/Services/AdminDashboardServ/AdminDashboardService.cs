@@ -332,6 +332,28 @@ namespace E_PharmaHub.Services.AdminDashboardServ
             return report;
         }
 
+        public async Task<AdminOverviewDto> GetAdminOverviewAsync()
+        {
+            var payments = await _unitOfWork.Payments.GetAllAsync();
+            var doctors = await _unitOfWork.Doctors.GetAllAsync();
+            var pharmacists = await _unitOfWork.PharmasistsProfile.GetAllAsync();
+            var users = await _unitOfWork.Useres.GetAllAsync();
+
+            var result = new AdminOverviewDto
+            {
+                TotalRegistrationRevenue = payments
+                    .Where(p => !string.IsNullOrEmpty(p.PaymentIntentId) &&
+                               (p.PaymentFor == PaymentForType.DoctorRegistration || p.PaymentFor == PaymentForType.PharmacistRegistration))
+                    .Sum(p => p.Amount),
+
+                TotalApprovedDoctors = doctors.Count(d => d.IsApproved),
+                TotalApprovedPharmacists = pharmacists.Count(p => p.IsApproved),
+                TotalRegisteredUsers = users.Count()
+            };
+
+            return result;
+        }
+
         private AdminStats CalculateStats(
             IEnumerable<E_PharmaHub.Models.Payment> payments,
             IEnumerable<E_PharmaHub.Models.DoctorProfile> doctors,
