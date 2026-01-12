@@ -61,7 +61,7 @@ namespace E_PharmaHub.Controllers
             var threads = await _chatService.GetUserThreadsAsync(userId);
             return Ok(threads);
         }
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Doctor")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpPost("start-with-admin")]
         public async Task<IActionResult> StartConversationWithAdmin()
         {
