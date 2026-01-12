@@ -62,7 +62,7 @@ namespace E_PharmaHub.Controllers
             return Ok(threads);
         }
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Doctor")]
-        [HttpPost("chat/start-with-admin")]
+        [HttpPost("start-with-admin")]
         public async Task<IActionResult> StartConversationWithAdmin()
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
