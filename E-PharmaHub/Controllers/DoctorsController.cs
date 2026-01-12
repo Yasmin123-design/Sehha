@@ -239,16 +239,7 @@ namespace E_PharmaHub.Controllers
             return Ok(clinic);
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Doctor")]
-        [HttpPost("chat/start-with-admin")]
-        public async Task<IActionResult> StartConversationWithAdmin()
-        {
-            if (string.IsNullOrEmpty(userId))
-                return Unauthorized();
 
-            var thread = await _chatService.StartConversationWithAdminAsync(userId);
-            return Ok(thread);
-        }
 
     }
 }

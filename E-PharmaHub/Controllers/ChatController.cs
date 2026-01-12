@@ -61,6 +61,20 @@ namespace E_PharmaHub.Controllers
             var threads = await _chatService.GetUserThreadsAsync(userId);
             return Ok(threads);
         }
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Doctor")]
+        [HttpPost("chat/start-with-admin")]
+        public async Task<IActionResult> StartConversationWithAdmin()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized(new { message = "User not authenticated." });
+
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            var thread = await _chatService.StartConversationWithAdminAsync(userId);
+            return Ok(thread);
+        }
     }
 }
 
