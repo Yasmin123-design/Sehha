@@ -3,6 +3,7 @@ using E_PharmaHub.Models.Enums;
 using E_PharmaHub.Services.ClinicServ;
 using E_PharmaHub.Services.DoctorAnalyticsServ;
 using E_PharmaHub.Services.DoctorServ;
+using E_PharmaHub.Services.ChatServ;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,15 +19,18 @@ namespace E_PharmaHub.Controllers
         private readonly IDoctorService _doctorService;
         private readonly IClinicService _clinicService;
         private readonly IDoctorAnalyticsService _doctorAnalyticsService;
+        private readonly IChatService _chatService;
         public DoctorsController(
             IDoctorService doctorService,
             IClinicService clinicService,
-            IDoctorAnalyticsService doctorAnalyticsService
+            IDoctorAnalyticsService doctorAnalyticsService,
+            IChatService chatService
             )
         {
             _doctorService = doctorService;
             _clinicService = clinicService;
             _doctorAnalyticsService = doctorAnalyticsService;
+            _chatService = chatService;
         }
 
         private string userId =>
@@ -233,6 +237,17 @@ namespace E_PharmaHub.Controllers
             var clinic = await _clinicService.GetMyClinicsAsync(userId!);
 
             return Ok(clinic);
+        }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Doctor")]
+        [HttpPost("chat/start-with-admin")]
+        public async Task<IActionResult> StartConversationWithAdmin()
+        {
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            var thread = await _chatService.StartConversationWithAdminAsync(userId);
+            return Ok(thread);
         }
 
     }

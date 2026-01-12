@@ -10,5 +10,6 @@ namespace E_PharmaHub.Services.ChatServ
         Task<IEnumerable<ChatMessage>> GetMessagesAsync(int threadId);
         Task<IEnumerable<ThreadDto>> GetUserThreadsAsync(string userId);
         Task<MessageThreadDto> StartConversationWithDoctorAsync(string userId, int doctorId);
+        Task<MessageThreadDto> StartConversationWithAdminAsync(string userId);
     }
 }

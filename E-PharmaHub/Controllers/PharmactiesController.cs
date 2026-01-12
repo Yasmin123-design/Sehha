@@ -2,6 +2,7 @@
 using E_PharmaHub.Services.PharmacistAnalyticsServ;
 using E_PharmaHub.Services.PharmacistServ;
 using E_PharmaHub.Services.PharmacyServ;
+using E_PharmaHub.Services.ChatServ;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,15 +17,18 @@ namespace E_PharmaHub.Controllers
         private readonly IPharmacistService _pharmacistService;
         private readonly IPharmacyService _pharmacyService;
         private readonly IPharmacistDashboardService _pharmacistDashboardService;
+        private readonly IChatService _chatService;
         public PharmactiesController(
             IPharmacistService pharmacistService,
             IPharmacyService pharmacyService,
-            IPharmacistDashboardService pharmacistDashboardService
+            IPharmacistDashboardService pharmacistDashboardService,
+            IChatService chatService
             )
         {
             _pharmacistService = pharmacistService;
             _pharmacyService = pharmacyService;
             _pharmacistDashboardService = pharmacistDashboardService;
+            _chatService = chatService;
         }
 
         [HttpPost("register")]
@@ -265,6 +269,21 @@ namespace E_PharmaHub.Controllers
         {
             var result = await _pharmacistDashboardService.GetOutOfStockLast30DaysAsync();
             return Ok(result);
+        }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Doctor")]
+        [HttpPost("chat/start-with-admin")]
+        public async Task<IActionResult> StartConversationWithAdmin()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized(new { message = "User not authenticated." });
+
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            var thread = await _chatService.StartConversationWithAdminAsync(userId);
+            return Ok(thread);
         }
     }
 

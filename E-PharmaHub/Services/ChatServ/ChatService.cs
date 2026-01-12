@@ -2,6 +2,7 @@
 using E_PharmaHub.Helpers;
 using E_PharmaHub.Hubs;
 using E_PharmaHub.Models;
+using E_PharmaHub.Services.UserServ;
 using E_PharmaHub.UnitOfWorkes;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
@@ -12,10 +13,12 @@ namespace E_PharmaHub.Services.ChatServ
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IHubContext<ChatHub> _hubContext;
-        public ChatService(IUnitOfWork unitOfWork, IHubContext<ChatHub> hubContext)
+        private readonly IUserService _userService;
+        public ChatService(IUnitOfWork unitOfWork, IHubContext<ChatHub> hubContext, IUserService userService)
         {
             _unitOfWork = unitOfWork;
             _hubContext = hubContext;
+            _userService = userService;
         }
         public async Task<MessageThreadDto> StartConversationWithPharmacistAsync(string userId, int pharmacistId)
         {
@@ -124,6 +127,42 @@ namespace E_PharmaHub.Services.ChatServ
                 .ToListAsync();
         }
 
-    }
+        public async Task<MessageThreadDto> StartConversationWithAdminAsync(string userId)
+        {
+            var adminUserId = await _userService.GetAdminUserIdAsync();
+            if (string.IsNullOrEmpty(adminUserId))
+                throw new Exception("Admin user not found.");
 
+            var existingThread = await _unitOfWork.Chat.GetThreadBetweenUsersAsync(userId, adminUserId);
+            if (existingThread != null)
+            {
+                return new MessageThreadDto
+                {
+                    Id = existingThread.Id,
+                    Title = existingThread.Title,
+                    ParticipantIds = existingThread.Participants.Select(p => p.UserId).ToList()
+                };
+            }
+
+            var thread = new MessageThread
+            {
+                Title = $"Support Chat",
+                Participants = new List<MessageThreadParticipant>
+                {
+                    new MessageThreadParticipant { UserId = userId },
+                    new MessageThreadParticipant { UserId = adminUserId }
+                }
+            };
+
+            await _unitOfWork.MessageThread.AddAsync(thread);
+            await _unitOfWork.CompleteAsync();
+
+            return new MessageThreadDto
+            {
+                Id = thread.Id,
+                Title = thread.Title,
+                ParticipantIds = thread.Participants.Select(p => p.UserId).ToList()
+            };
+        }
+    }
 }
