@@ -1,8 +1,10 @@
 ﻿using E_PharmaHub.Dtos;
+using E_PharmaHub.Helpers;
 using E_PharmaHub.Hubs;
 using E_PharmaHub.Models;
 using E_PharmaHub.UnitOfWorkes;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 
 namespace E_PharmaHub.Services.ChatServ
 {
@@ -10,14 +12,11 @@ namespace E_PharmaHub.Services.ChatServ
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IHubContext<ChatHub> _hubContext;
-
-
         public ChatService(IUnitOfWork unitOfWork, IHubContext<ChatHub> hubContext)
         {
             _unitOfWork = unitOfWork;
             _hubContext = hubContext;
         }
-
         public async Task<MessageThreadDto> StartConversationWithPharmacistAsync(string userId, int pharmacistId)
         {
             var pharmacist = await _unitOfWork.PharmasistsProfile.GetByIdAsync(pharmacistId);
@@ -96,8 +95,6 @@ namespace E_PharmaHub.Services.ChatServ
                 ParticipantIds = thread.Participants.Select(p => p.UserId).ToList()
             };
         }
-
-
         public async Task<ChatMessage> SendMessageAsync(int threadId, string senderId, string text)
         {
             var message = new ChatMessage
@@ -122,26 +119,9 @@ namespace E_PharmaHub.Services.ChatServ
 
         public async Task<IEnumerable<ThreadDto>> GetUserThreadsAsync(string userId)
         {
-            var threads = await _unitOfWork.Chat.GetUserThreadsAsync(userId);
-
-            return threads.Select(t => new ThreadDto
-            {
-                Id = t.Id,
-                Title = t.Title,
-                Participants = t.Participants.Select(p => new ParticipantDto
-                {
-                    UserId = p.UserId,
-                    UserName = p.User?.UserName ?? "Unknown"
-                }).ToList(),
-                LastMessage = t.Messages
-                    .OrderByDescending(m => m.SentAt)
-                    .Select(m => new LastMessageDto
-                    {
-                        Text = m.Text,
-                        SentAt = m.SentAt
-                    })
-                    .FirstOrDefault()
-            });
+            return await _unitOfWork.Chat.GetUserThreadsQueryable(userId)
+                .ProjectToThreadDto()
+                .ToListAsync();
         }
 
     }

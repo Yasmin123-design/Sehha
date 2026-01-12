@@ -10,6 +10,7 @@ using E_PharmaHub.Services.PharmacistServ;
 using E_PharmaHub.Services.PharmacyServ;
 using E_PharmaHub.Services.UserServ;
 using E_PharmaHub.Services.AdminDashboardServ;
+using E_PharmaHub.Services.ChatServ;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -33,6 +34,7 @@ namespace E_PharmaHub.Controllers
         private readonly IPaymentService _paymentService;
         private readonly INotificationService _notificationService;
         private readonly IAdminDashboardService _adminDashboardService;
+        private readonly IChatService _chatService;
         public AdminController(
             IDoctorService doctorService,
             IPharmacistService pharmacistService,
@@ -44,7 +46,8 @@ namespace E_PharmaHub.Controllers
             IUserService userService,
             IPaymentService paymentService,
             INotificationService notificationService,
-            IAdminDashboardService adminDashboardService
+            IAdminDashboardService adminDashboardService,
+            IChatService chatService
             )
         {
             _doctorService = doctorService;
@@ -58,6 +61,7 @@ namespace E_PharmaHub.Controllers
             _orderService = orderService;
             _userService = userService;
             _adminDashboardService = adminDashboardService;
+            _chatService = chatService;
         }
         [HttpGet("allDoctorsShowToAdmin")]
         public async Task<IActionResult> GetAllDoctorsShowToAdmin()
@@ -584,6 +588,49 @@ namespace E_PharmaHub.Controllers
         {
             var result = await _adminDashboardService.GetAdminOverviewAsync();
             return Ok(result);
+        }
+
+        [HttpPost("chat/start-with-pharmacist")]
+        public async Task<IActionResult> StartConversationWithPharmacist([FromQuery] int pharmacistId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var thread = await _chatService.StartConversationWithPharmacistAsync(userId, pharmacistId);
+            return Ok(thread);
+        }
+
+        [HttpPost("chat/start-with-doctor")]
+        public async Task<IActionResult> StartConversationWithDoctor([FromQuery] int doctorId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var thread = await _chatService.StartConversationWithDoctorAsync(userId, doctorId);
+            return Ok(thread);
+        }
+
+
+        [HttpPost("chat/send")]
+        public async Task<IActionResult> SendMessage([FromBody] SendMessageDto dto)
+        {
+            var senderId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var message = await _chatService.SendMessageAsync(dto.ThreadId, senderId, dto.Text);
+            return Ok(message);
+        }
+
+        [HttpGet("chat/{threadId}/messages")]
+        public async Task<IActionResult> GetMessages(int threadId)
+        {
+            var messages = await _chatService.GetMessagesAsync(threadId);
+            return Ok(messages);
+        }
+
+        [HttpGet("chat/my-threads")]
+        public async Task<IActionResult> GetMyThreads()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var threads = await _chatService.GetUserThreadsAsync(userId);
+            return Ok(threads);
         }
     }
 }

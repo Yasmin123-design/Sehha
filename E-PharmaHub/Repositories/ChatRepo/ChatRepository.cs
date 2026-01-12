@@ -27,12 +27,16 @@ namespace E_PharmaHub.Repositories.ChatRepo
 
         public async Task<IEnumerable<MessageThread>> GetUserThreadsAsync(string userId)
         {
-            return await _context.MessageThreads
+            return await GetUserThreadsQueryable(userId).ToListAsync();
+        }
+
+        public IQueryable<MessageThread> GetUserThreadsQueryable(string userId)
+        {
+            return _context.MessageThreads
                 .Include(m => m.Messages)
                 .Include(t => t.Participants)
                 .ThenInclude(a => a.User)
-                .Where(t => t.Participants.Any(p => p.UserId == userId))
-                .ToListAsync();
+                .Where(t => t.Participants.Any(p => p.UserId == userId));
         }
 
         public async Task<MessageThread?> GetThreadBetweenUsersAsync(string user1Id, string user2Id)
