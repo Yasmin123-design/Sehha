@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-
 namespace E_PharmaHub.Controllers
 {
     [Route("api/[controller]")]
@@ -12,7 +11,6 @@ namespace E_PharmaHub.Controllers
     public class ReviewController : Controller
     {
         private readonly IReviewService _reviewService;
-
         public ReviewController(IReviewService reviewService)
         {
             _reviewService = reviewService;
@@ -39,7 +37,7 @@ namespace E_PharmaHub.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "RegularUser")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "RegularUser,Admin")]
         public async Task<IActionResult> UpdateReview(int id, [FromBody] Review updatedReview)
         {
             if (!ModelState.IsValid)
@@ -62,7 +60,7 @@ namespace E_PharmaHub.Controllers
 
 
         [HttpDelete("{id}")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "RegularUser,Admin")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> DeleteReview(int id)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
