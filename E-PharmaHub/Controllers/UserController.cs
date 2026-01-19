@@ -147,22 +147,24 @@ namespace E_PharmaHub.Controllers
             var refreshToken = GenerateRefreshToken();
             await _userService.SaveRefreshTokenAsync(user.Id, refreshToken);
 
+            var isHttps = Request.IsHttps;
+
             Response.Cookies.Append("auth_token", token, new CookieOptions
             {
-                HttpOnly = true,         
-                Secure = true,            
-                SameSite = SameSiteMode.None,  // Lax for HTTP (development)
-                Path = "/",                   
+                HttpOnly = true,
+                Secure = isHttps,
+                SameSite = isHttps ? SameSiteMode.None : SameSiteMode.Lax,
+                Path = "/",
                 Expires = DateTimeOffset.UtcNow.AddMinutes(30)
             });
 
             Response.Cookies.Append("refresh_token", refreshToken, new CookieOptions
             {
                 HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.None, 
-                Path = "/",                   
-                Expires = DateTimeOffset.UtcNow.AddDays(7) 
+                Secure = isHttps,
+                SameSite = isHttps ? SameSiteMode.None : SameSiteMode.Lax,
+                Path = "/",
+                Expires = DateTimeOffset.UtcNow.AddDays(7)
             });
             return Ok(new
             {
@@ -195,21 +197,23 @@ namespace E_PharmaHub.Controllers
 
             await _userService.SaveRefreshTokenAsync(user.Id, newRefreshToken);
 
+            var isHttps = Request.IsHttps;
+
             Response.Cookies.Append("auth_token", newAccessToken, new CookieOptions
             {
                 HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.None,
-                Path = "/",                  
+                Secure = isHttps,
+                SameSite = isHttps ? SameSiteMode.None : SameSiteMode.Lax,
+                Path = "/",
                 Expires = DateTimeOffset.UtcNow.AddMinutes(30)
             });
             Response.Cookies.Append("refresh_token", newRefreshToken, new CookieOptions
             {
                 HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.None,
-                Path = "/",                  
-                Expires = DateTimeOffset.UtcNow.AddDays(7) 
+                Secure = isHttps,
+                SameSite = isHttps ? SameSiteMode.None : SameSiteMode.Lax,
+                Path = "/",
+                Expires = DateTimeOffset.UtcNow.AddDays(7)
             });
 
             return Ok();
@@ -225,11 +229,13 @@ namespace E_PharmaHub.Controllers
 
             await _userService.RevokeAllRefreshTokensAsync(userId);
 
+            var isHttps = Request.IsHttps;
+
             var cookieOptions = new CookieOptions
             {
                 HttpOnly = true,
-                Secure = true,         
-                SameSite = SameSiteMode.None,
+                Secure = isHttps,
+                SameSite = isHttps ? SameSiteMode.None : SameSiteMode.Lax,
                 Path = "/"
             };
 

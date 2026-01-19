@@ -68,7 +68,12 @@ namespace E_PharmaHub.Controllers
 
             var result = await _reviewService.DeleteReviewAsync(id, userId);
             if (!result)
-                return Forbid("You can only delete your own reviews.");
+            {
+                return StatusCode(403, new
+                {
+                    message = "You can only delete your own reviews."
+                });
+            }
 
             return Ok(new { message = "Review deleted successfully." });
         }
