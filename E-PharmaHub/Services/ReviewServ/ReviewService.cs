@@ -1,5 +1,6 @@
 ﻿using E_PharmaHub.Dtos;
 using E_PharmaHub.Models;
+using E_PharmaHub.Models.Enums;
 using E_PharmaHub.UnitOfWorkes;
 
 namespace E_PharmaHub.Services.ReviewServ
@@ -47,14 +48,37 @@ namespace E_PharmaHub.Services.ReviewServ
         public async Task<bool> DeleteReviewAsync(int id, string userId)
         {
             var existingReview = await _unitOfWork.Reviews.GetByIdAsync(id);
-            if (existingReview == null || existingReview.UserId != userId)
+            if (existingReview == null)
                 return false;
+
+            var user = await _unitOfWork.Useres.GetByIdAsync(userId);
+            if (user == null)
+                return false;
+
+            if (user.Role == UserRole.RegularUser)
+            {
+                if (existingReview.UserId != userId)
+                    return false;
+            }
+            else if (user.Role == UserRole.Doctor)
+            {
+                var doctor = await _unitOfWork.Doctors.GetDoctorByUserIdAsync(userId);
+                if (doctor == null || existingReview.DoctorId != doctor.Id)
+                    return false;
+            }
+            else if (user.Role == UserRole.Pharmacist)
+            {
+                var pharmacist = await _unitOfWork.PharmasistsProfile.GetByUserIdAsync(userId);
+                if (pharmacist == null || existingReview.PharmacyId != pharmacist.PharmacyId)
+                    return false;
+            }
 
             _unitOfWork.Reviews.Delete(existingReview);
             await _unitOfWork.CompleteAsync();
 
             return true;
         }
+
 
         public async Task<IEnumerable<ReviewDto>> GetReviewsByPharmacyIdAsync(int pharmacyId)
         {

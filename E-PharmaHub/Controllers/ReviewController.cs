@@ -58,7 +58,6 @@ namespace E_PharmaHub.Controllers
             return Ok(new { message = "Review updated successfully." });
         }
 
-
         [HttpDelete("{id}")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> DeleteReview(int id)
