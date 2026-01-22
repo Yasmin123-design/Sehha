@@ -69,14 +69,14 @@ namespace E_PharmaHub.Controllers
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var success = await _donorService.UpdateAvailabilityAsync(userId, isAvailable);
             if (!success) return NotFound("Donor not found.");
-            return Ok("Availability updated successfully.");
+            return Ok(new { message = "Availability updated successfully." });
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             await _donorService.DeleteAsync(id);
-            return Ok("Donor deleted successfully");
+            return Ok(new { message = "Donor deleted successfully" });
         }
     }
 }
