@@ -7,7 +7,7 @@ using E_PharmaHub.UnitOfWorkes;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-namespace E_PharmaHub.Services
+namespace E_PharmaHub.Services.DonorServ
 {
     public class DonorService : IDonorService
     {
@@ -54,24 +54,9 @@ namespace E_PharmaHub.Services
 
         public async Task<DonorReadDto> RegisterAsync(DonorRegisterDto dto)
         {
-            var existingUser = await _userManager.FindByEmailAsync(dto.Email);
-            if (existingUser != null)
-                throw new Exception("This email is already registered.");
-
-            var user = new AppUser
-            {
-                UserName = dto.Email,
-                Email = dto.Email,
-                Role = UserRole.Donor
-            };
-
-            var result = await _userManager.CreateAsync(user, dto.Password);
-            if (!result.Succeeded)
-                throw new Exception(string.Join("; ", result.Errors.Select(e => e.Description)));
-
             var donor = new DonorProfile
             {
-                AppUserId = user.Id,
+                AppUserId = dto.UserId,
                 BloodType = dto.BloodType,
                 DonorCity = dto.City,
                 DonorCountry = dto.Country,

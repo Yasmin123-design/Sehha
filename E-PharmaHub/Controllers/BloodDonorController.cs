@@ -1,6 +1,6 @@
 ﻿using E_PharmaHub.Dtos;
 using E_PharmaHub.Models.Enums;
-using E_PharmaHub.Services;
+using E_PharmaHub.Services.DonorServ;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -36,6 +36,8 @@ namespace E_PharmaHub.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] DonorRegisterDto dto)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            dto.UserId = userId;
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 

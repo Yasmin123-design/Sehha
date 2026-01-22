@@ -2,7 +2,7 @@
 using E_PharmaHub.Models;
 using E_PharmaHub.Models.Enums;
 
-namespace E_PharmaHub.Services
+namespace E_PharmaHub.Services.DonorServ
 {
     public interface IDonorService
     {

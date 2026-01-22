@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using System.Text.Json;
-using E_PharmaHub.Services;
 using E_PharmaHub.UnitOfWorkes;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -69,6 +68,7 @@ using E_PharmaHub.Services.BloodRequestServ;
 using E_PharmaHub.Repositories.BloodRequestRepo;
 using E_PharmaHub.Repositories.DonorRepo;
 using E_PharmaHub.Repositories.DonorMatchRepo;
+using E_PharmaHub.Services.DonorServ;
 
 namespace E_PharmaHub
 {
