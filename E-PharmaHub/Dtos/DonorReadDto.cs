@@ -12,6 +12,5 @@
         public string? DonorTelephone { get; set; }
         public bool IsAvailable { get; set; }
         public DateTime? LastDonationDate { get; set; }
-        public BloodRequestResponseDto? BloodRequest { get; set; }
     }
 }
