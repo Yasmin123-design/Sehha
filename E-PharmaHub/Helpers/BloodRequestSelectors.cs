@@ -11,7 +11,6 @@ namespace E_PharmaHub.Helpers
             {
                 Id = request.Id,
                 RequestedByUserId = request.RequestedByUserId,
-                RequestedByUserName = request.RequestedBy?.UserName,
                 RequiredType = request.RequiredType,
                 City = request.HospitalCity,
                 Country = request.HospitalCountry,
@@ -31,7 +30,6 @@ namespace E_PharmaHub.Helpers
             {
                 Id = request.Id,
                 RequestedByUserId = request.RequestedByUserId,
-                RequestedByUserName = request.RequestedBy.UserName,
                 RequiredType = request.RequiredType,
                 City = request.HospitalCity,
                 Country = request.HospitalCountry,
