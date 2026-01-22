@@ -4,6 +4,7 @@ using E_PharmaHub.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace E_PharmaHub.Migrations
 {
     [DbContext(typeof(EHealthDbContext))]
-    partial class EHealthDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260122221941_tst")]
+    partial class tst
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -531,7 +534,8 @@ namespace E_PharmaHub.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AppUserId");
+                    b.HasIndex("AppUserId")
+                        .IsUnique();
 
                     b.HasIndex("BloodRequestId");
 
@@ -1445,8 +1449,8 @@ namespace E_PharmaHub.Migrations
             modelBuilder.Entity("E_PharmaHub.Models.DonorProfile", b =>
                 {
                     b.HasOne("E_PharmaHub.Models.AppUser", "AppUser")
-                        .WithMany("DonorProfiles")
-                        .HasForeignKey("AppUserId")
+                        .WithOne("DonorProfile")
+                        .HasForeignKey("E_PharmaHub.Models.DonorProfile", "AppUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1774,7 +1778,7 @@ namespace E_PharmaHub.Migrations
 
                     b.Navigation("DoctorProfile");
 
-                    b.Navigation("DonorProfiles");
+                    b.Navigation("DonorProfile");
 
                     b.Navigation("MessageThreads");
 

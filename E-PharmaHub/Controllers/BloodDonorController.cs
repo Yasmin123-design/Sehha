@@ -59,8 +59,13 @@ namespace E_PharmaHub.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new
+                {
+                    error = ex.Message,
+                    inner = ex.InnerException?.Message
+                });
             }
+
         }
 
         [HttpPut("availability")]

@@ -97,8 +97,8 @@ namespace E_PharmaHub.Models
 
             modelBuilder.Entity<DonorProfile>()
                  .HasOne(d => d.AppUser)
-                 .WithOne(u => u.DonorProfile)
-                 .HasForeignKey<DonorProfile>(d => d.AppUserId);
+                 .WithMany(u => u.DonorProfiles)
+                 .HasForeignKey(d => d.AppUserId);
 
 
             modelBuilder.Entity<Address>()

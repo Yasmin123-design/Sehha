@@ -15,7 +15,7 @@ namespace E_PharmaHub.Models
         public string? PhoneNumber { get; set; }
 
         public string? Address { get; set; }
-        public virtual DonorProfile? DonorProfile { get; set; }
+        public virtual ICollection<DonorProfile>? DonorProfiles { get; set; }
         public virtual PharmacistProfile? PharmacistProfile { get; set; }
         public virtual DoctorProfile? DoctorProfile { get; set; }
         public virtual ICollection<Order>? Orders { get; set; }
