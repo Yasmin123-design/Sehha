@@ -6,7 +6,6 @@ using E_PharmaHub.Repositories.CartRepo;
 using E_PharmaHub.Repositories.ChatRepo;
 using E_PharmaHub.Repositories.ClinicRepo;
 using E_PharmaHub.Repositories.DoctorRepo;
-using E_PharmaHub.Repositories.DonorMatchRepo;
 using E_PharmaHub.Repositories.DonorRepo;
 using E_PharmaHub.Repositories.FavoriteMedicationRepo;
 using E_PharmaHub.Repositories.FavouriteClinicRepo;
@@ -54,7 +53,6 @@ namespace E_PharmaHub.UnitOfWorkes
         IAddressRepository Addresses { get; }
         IOrderItemRepository OrderItems { get; }
 
-        IDonorMatchRepository donorMatches { get; }
         INotificationRepository Notifications { get; }
         ICartItemRepository CartItemRepository { get; }
         IPrescriptionItemRepository PrescriptionItems { get; }

@@ -20,21 +20,28 @@ namespace E_PharmaHub.Controllers
             _donorService = donorService;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAll()
+        //[HttpGet]
+        //public async Task<IActionResult> GetAll()
+        //{
+        //    var donors = await _donorService.GetAllDetailsAsync();
+        //    return Ok(donors);
+        //}
+
+        //[HttpGet("filter")]
+        //public async Task<IActionResult> Filter([FromQuery] BloodType? type, [FromQuery] string? city)
+        //{
+        //    var donors = await _donorService.GetByFilterAsync(type, city);
+        //    return Ok(donors);
+        //}
+
+        [HttpGet("by-request/{requestId}")]
+        public async Task<IActionResult> GetByRequestId(int requestId)
         {
-            var donors = await _donorService.GetAllDetailsAsync();
+            var donors = await _donorService.GetDonorsByRequestIdAsync(requestId);
             return Ok(donors);
         }
 
-        [HttpGet("filter")]
-        public async Task<IActionResult> Filter([FromQuery] BloodType? type, [FromQuery] string? city)
-        {
-            var donors = await _donorService.GetByFilterAsync(type, city);
-            return Ok(donors);
-        }
-
-        [HttpPost("register")]
+        [HttpPost("Donate")]
         public async Task<IActionResult> Register([FromBody] DonorRegisterDto dto)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);

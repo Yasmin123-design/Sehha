@@ -29,7 +29,6 @@ namespace E_PharmaHub.Models
         public DbSet<Clinic> Clinics { get; set; }
         public DbSet<Appointment> Appointments { get; set; }
         public DbSet<BloodRequest> BloodRequests { get; set; }
-        public DbSet<DonorMatch> DonorMatches { get; set; }
         public DbSet<MessageThread> MessageThreads { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }

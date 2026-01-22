@@ -24,7 +24,6 @@ using E_PharmaHub.Repositories.PrescriptionItemRepo;
 using E_PharmaHub.Repositories.OrderItemRepo;
 using E_PharmaHub.Repositories.BloodRequestRepo;
 using E_PharmaHub.Repositories.DonorRepo;
-using E_PharmaHub.Repositories.DonorMatchRepo;
 
 namespace E_PharmaHub.UnitOfWorkes
 {
@@ -41,7 +40,6 @@ namespace E_PharmaHub.UnitOfWorkes
         public IInventoryItemRepository IinventoryItem { get; }
         public ICartRepository Carts { get; }
         public IPharmacistRepository PharmasistsProfile { get; }
-        public IDonorMatchRepository donorMatches { get; }
         public IPaymentRepository Payments { get; }
         public IOrderRepository Order  { get; }
 
@@ -73,7 +71,6 @@ namespace E_PharmaHub.UnitOfWorkes
             IAddressRepository addressRepository,
             IBloodRequestRepository bloodRequestRepository,
             IDonorRepository donorRepository,
-            IDonorMatchRepository donorMatchRepository,
             IPaymentRepository paymentRepository,
             IPharmacyRepository pharmacyRepository,
             ICartRepository cartRepository ,
@@ -109,7 +106,6 @@ namespace E_PharmaHub.UnitOfWorkes
             Doctors = doctorRepository;
             Clinics = new ClinicRepository(_context);
             Donors = donorRepository;
-            donorMatches = donorMatchRepository;
             Order = orderRepository;
             Favorite = favoriteMedicationRepository;
             FavouriteClinic = favouriteClinicRepository;

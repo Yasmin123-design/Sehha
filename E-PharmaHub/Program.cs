@@ -67,7 +67,6 @@ using E_PharmaHub.Services.AdminDashboardServ;
 using E_PharmaHub.Services.BloodRequestServ;
 using E_PharmaHub.Repositories.BloodRequestRepo;
 using E_PharmaHub.Repositories.DonorRepo;
-using E_PharmaHub.Repositories.DonorMatchRepo;
 using E_PharmaHub.Services.DonorServ;
 
 namespace E_PharmaHub
@@ -209,7 +208,6 @@ namespace E_PharmaHub
             builder.Services.AddScoped<IDoctorService, DoctorService>();
             builder.Services.AddScoped<IInventoryService, InventoryService>();
             builder.Services.AddScoped<IInventoryItemRepository, InventoryItemRepository>();
-            builder.Services.AddScoped<IDonorMatchRepository, DonorMatchRepository>();
             builder.Services.AddScoped<IOrderRepository, OrderRepository>();
             builder.Services.AddScoped<IOrderService, OrderService>();
             builder.Services.AddScoped<ICartRepository, CartRepository>();

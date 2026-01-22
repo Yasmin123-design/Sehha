@@ -47,6 +47,14 @@ namespace E_PharmaHub.Services.DonorServ
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<DonorReadDto>> GetDonorsByRequestIdAsync(int requestId)
+        {
+            return await _unitOfWork.Donors.GetQueryable()
+                .Where(d => d.BloodRequestId == requestId)
+                .SelectDonorReadDto()
+                .ToListAsync();
+        }
+
         public async Task<DonorProfile?> GetByUserIdAsync(string userId)
         {
             return await _unitOfWork.Donors.GetByUserIdAsync(userId);
