@@ -12,7 +12,6 @@ namespace E_PharmaHub.Models
         public UserRole Role { get; set; } = UserRole.RegularUser;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public string? ProfileImage { get; set; }
-
         public string? PhoneNumber { get; set; }
 
         public string? Address { get; set; }

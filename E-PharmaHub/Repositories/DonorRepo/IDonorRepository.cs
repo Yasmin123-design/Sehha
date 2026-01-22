@@ -2,7 +2,7 @@
 using E_PharmaHub.Models;
 using E_PharmaHub.Models.Enums;
 
-namespace E_PharmaHub.Repositories
+namespace E_PharmaHub.Repositories.DonorRepo
 {
     public interface IDonorRepository : IGenericRepository<DonorProfile>
     {
@@ -10,5 +10,6 @@ namespace E_PharmaHub.Repositories
         Task<DonorProfile?> GetByUserIdAsync(string userId);
         Task<bool> UpdateAvailabilityAsync(string userId, bool isAvailable);
         Task<IEnumerable<DonorReadDto>> GetAllDetailsAsync();
+        IQueryable<DonorProfile> GetQueryable();
     }
 }

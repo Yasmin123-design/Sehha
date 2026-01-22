@@ -1,6 +1,6 @@
 ﻿using E_PharmaHub.Models;
 
-namespace E_PharmaHub.Repositories
+namespace E_PharmaHub.Repositories.BloodRequestRepo
 {
     public interface IBloodRequestRepository : IGenericRepository<BloodRequest>
     {

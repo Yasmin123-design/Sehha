@@ -1,5 +1,4 @@
 ﻿using E_PharmaHub.Models;
-using E_PharmaHub.Repositories;
 using E_PharmaHub.Repositories.AddressRepo;
 using E_PharmaHub.Repositories.AppointmentRepo;
 using E_PharmaHub.Repositories.CartRepo;
@@ -23,6 +22,9 @@ using E_PharmaHub.Repositories.NotificationRepo;
 using E_PharmaHub.Repositories.CartItemRepo;
 using E_PharmaHub.Repositories.PrescriptionItemRepo;
 using E_PharmaHub.Repositories.OrderItemRepo;
+using E_PharmaHub.Repositories.BloodRequestRepo;
+using E_PharmaHub.Repositories.DonorRepo;
+using E_PharmaHub.Repositories.DonorMatchRepo;
 
 namespace E_PharmaHub.UnitOfWorkes
 {

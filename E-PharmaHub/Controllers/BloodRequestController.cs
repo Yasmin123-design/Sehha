@@ -1,5 +1,5 @@
 ﻿using E_PharmaHub.Models;
-using E_PharmaHub.Services;
+using E_PharmaHub.Services.BloodRequestServ;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -21,7 +21,7 @@ namespace E_PharmaHub.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var result = await _bloodRequestService.GetAllRequestsAsync();
+            var result = await _bloodRequestService.GetAllBloodRequestsDtoAsync();
             return Ok(result);
         }
 

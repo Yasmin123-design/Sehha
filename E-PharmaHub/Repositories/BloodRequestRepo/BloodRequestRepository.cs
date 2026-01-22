@@ -1,7 +1,7 @@
 ﻿using E_PharmaHub.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace E_PharmaHub.Repositories
+namespace E_PharmaHub.Repositories.BloodRequestRepo
 {
     public class BloodRequestRepository : IBloodRequestRepository
     {

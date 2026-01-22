@@ -1,9 +1,11 @@
 ﻿using E_PharmaHub.Dtos;
+using E_PharmaHub.Helpers;
 using E_PharmaHub.Models;
 using E_PharmaHub.Models.Enums;
 using E_PharmaHub.Services.PaymentServ;
 using E_PharmaHub.UnitOfWorkes;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace E_PharmaHub.Services
 {
@@ -25,12 +27,24 @@ namespace E_PharmaHub.Services
 
         public async Task<IEnumerable<DonorReadDto>> GetAllDetailsAsync()
         {
-            return await _unitOfWork.Donors.GetAllDetailsAsync();
+            return await _unitOfWork.Donors.GetQueryable()
+                .SelectDonorReadDto()
+                .ToListAsync();
         }
 
         public async Task<IEnumerable<DonorReadDto>> GetByFilterAsync(BloodType? type, string? city)
         {
-            return await _unitOfWork.Donors.GetByFilterAsync(type, city);
+            var query = _unitOfWork.Donors.GetQueryable();
+
+            if (type.HasValue)
+                query = query.Where(d => d.BloodType == type.Value);
+
+            if (!string.IsNullOrEmpty(city))
+                query = query.Where(d => d.DonorCity.ToLower() == city.ToLower());
+
+            return await query
+                .SelectDonorReadDto()
+                .ToListAsync();
         }
 
         public async Task<DonorProfile?> GetByUserIdAsync(string userId)
@@ -38,7 +52,7 @@ namespace E_PharmaHub.Services
             return await _unitOfWork.Donors.GetByUserIdAsync(userId);
         }
 
-        public async Task<DonorProfile> RegisterAsync(DonorRegisterDto dto)
+        public async Task<DonorReadDto> RegisterAsync(DonorRegisterDto dto)
         {
             var existingUser = await _userManager.FindByEmailAsync(dto.Email);
             if (existingUser != null)
@@ -59,16 +73,18 @@ namespace E_PharmaHub.Services
             {
                 AppUserId = user.Id,
                 BloodType = dto.BloodType,
-                City = dto.City,
+                DonorCity = dto.City,
+                DonorCountry = dto.Country,
+                DonorLatitude = dto.Latitude,
+                DonorLongitude = dto.Longitude,
                 IsAvailable = true
             };
 
             await _unitOfWork.Donors.AddAsync(donor);
             await _unitOfWork.CompleteAsync();
 
-            return donor;
+            return donor.ToDonorReadDto();
         }
-
 
         public async Task<bool> UpdateAvailabilityAsync(string userId, bool isAvailable)
         {
@@ -81,7 +97,6 @@ namespace E_PharmaHub.Services
             _unitOfWork.Donors.Update(donor);
             await _unitOfWork.CompleteAsync();
         }
-
         public async Task DeleteAsync(int id)
         {
             var donor = await _unitOfWork.Donors.GetByIdAsync(id);

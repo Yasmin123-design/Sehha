@@ -1,11 +1,13 @@
-﻿using E_PharmaHub.Repositories;
-using E_PharmaHub.Repositories.AddressRepo;
+﻿using E_PharmaHub.Repositories.AddressRepo;
 using E_PharmaHub.Repositories.AppointmentRepo;
+using E_PharmaHub.Repositories.BloodRequestRepo;
 using E_PharmaHub.Repositories.CartItemRepo;
 using E_PharmaHub.Repositories.CartRepo;
 using E_PharmaHub.Repositories.ChatRepo;
 using E_PharmaHub.Repositories.ClinicRepo;
 using E_PharmaHub.Repositories.DoctorRepo;
+using E_PharmaHub.Repositories.DonorMatchRepo;
+using E_PharmaHub.Repositories.DonorRepo;
 using E_PharmaHub.Repositories.FavoriteMedicationRepo;
 using E_PharmaHub.Repositories.FavouriteClinicRepo;
 using E_PharmaHub.Repositories.FavouriteDoctorRepo;

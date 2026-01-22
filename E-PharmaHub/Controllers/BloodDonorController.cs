@@ -44,10 +44,7 @@ namespace E_PharmaHub.Controllers
                 var result = await _donorService.RegisterAsync(dto);
                 return Ok(new
                 {
-                    message = "Donor registered successfully! Awaiting admin approval.",
-                    userId = result.AppUserId,
-                    email = result.AppUser.Email,
-                    role = result.AppUser.Role.ToString()
+                    message = "Donor registered successfully!",
                 });
             }
             catch (Exception ex)

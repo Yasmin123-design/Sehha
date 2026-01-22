@@ -1,8 +1,10 @@
-﻿using E_PharmaHub.Models;
+﻿using E_PharmaHub.Dtos;
+using E_PharmaHub.Helpers;
+using E_PharmaHub.Models;
 using E_PharmaHub.Repositories;
 using E_PharmaHub.UnitOfWorkes;
 
-namespace E_PharmaHub.Services
+namespace E_PharmaHub.Services.BloodRequestServ
 {
     public class BloodRequestService : IBloodRequestService
     {
@@ -13,19 +15,24 @@ namespace E_PharmaHub.Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<IEnumerable<BloodRequest>> GetAllRequestsAsync()
+
+        public async Task<IEnumerable<BloodRequestResponseDto>> GetAllBloodRequestsDtoAsync()
         {
-            return await _unitOfWork.BloodRequest.GetAllAsync();
+            var requests = await _unitOfWork.BloodRequest.GetAllAsync();
+            return requests.Select(r => r.ToBloodRequestResponseDto());
         }
 
-        public async Task<BloodRequest?> GetRequestByIdAsync(int id)
+        public async Task<BloodRequestResponseDto?> GetRequestByIdAsync(int id)
         {
-            return await _unitOfWork.BloodRequest.GetByIdAsync(id);
+            var request = await _unitOfWork.BloodRequest.GetByIdAsync(id);
+            return request?.ToBloodRequestResponseDto();
         }
 
-        public async Task<IEnumerable<BloodRequest>> GetUnfulfilledRequestsAsync()
+        public async Task<IEnumerable<BloodRequestResponseDto>> GetUnfulfilledRequestsAsync()
         {
-            return await _unitOfWork.BloodRequest.GetUnfulfilledRequestsAsync();
+            var requests = await _unitOfWork.BloodRequest.GetUnfulfilledRequestsAsync();
+            return requests.Select(r => r.ToBloodRequestResponseDto());
+
         }
 
         public async Task<BloodRequest> AddRequestAsync(BloodRequest request)
@@ -41,12 +48,16 @@ namespace E_PharmaHub.Services
             if (existing == null) return false;
 
             existing.RequiredType = updatedRequest.RequiredType;
-            existing.City = updatedRequest.City;
+            existing.HospitalCity = updatedRequest.HospitalCity;
+            existing.HospitalCountry = updatedRequest.HospitalCountry;
+            existing.HospitalLongitude = updatedRequest.HospitalLongitude;
+            existing.HospitalLatitude = updatedRequest.HospitalLatitude;
             existing.HospitalName = updatedRequest.HospitalName;
             existing.Units = updatedRequest.Units;
+            existing.NeedWithin = updatedRequest.NeedWithin;
             existing.Fulfilled = updatedRequest.Fulfilled;
 
-             _unitOfWork.BloodRequest.Update(existing);
+            _unitOfWork.BloodRequest.Update(existing);
             await _unitOfWork.CompleteAsync();
             return true;
         }

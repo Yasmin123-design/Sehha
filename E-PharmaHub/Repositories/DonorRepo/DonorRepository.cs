@@ -3,7 +3,7 @@ using E_PharmaHub.Models;
 using E_PharmaHub.Models.Enums;
 using Microsoft.EntityFrameworkCore;
 
-namespace E_PharmaHub.Repositories
+namespace E_PharmaHub.Repositories.DonorRepo
 {
     public class DonorRepository : IDonorRepository
     {
@@ -17,13 +17,14 @@ namespace E_PharmaHub.Repositories
         {
             var query = _context.DonorProfiles
                 .Include(d => d.AppUser)
+                .ThenInclude(a => a.Address)
                 .AsQueryable();
 
             if (type.HasValue)
                 query = query.Where(d => d.BloodType == type.Value);
 
             if (!string.IsNullOrEmpty(city))
-                query = query.Where(d => d.City.ToLower() == city.ToLower());
+                query = query.Where(d => d.DonorCity.ToLower() == city.ToLower());
 
             return await query
                 .Select(d => new DonorReadDto
@@ -31,7 +32,10 @@ namespace E_PharmaHub.Repositories
                     Id = d.Id,
                     Email = d.AppUser.Email,
                     BloodType = d.BloodType.ToString(),
-                    City = d.City,
+                    City = d.DonorCity,
+                    Country = d.DonorCountry,
+                    Longitude = d.DonorLongitude,
+                    Latitude = d.DonorLatitude,
                     IsAvailable = d.IsAvailable,
                     LastDonationDate = d.LastDonationDate
                 })
@@ -54,8 +58,8 @@ namespace E_PharmaHub.Repositories
             donor.IsAvailable = isAvailable;
             return true;
         }
-        public async Task<IEnumerable<DonorProfile>> GetAllAsync() 
-        { 
+        public async Task<IEnumerable<DonorProfile>> GetAllAsync()
+        {
             return await _context.DonorProfiles.Include(d => d.AppUser).ToListAsync();
         }
         public async Task<IEnumerable<DonorReadDto>> GetAllDetailsAsync()
@@ -67,7 +71,10 @@ namespace E_PharmaHub.Repositories
                     Id = d.Id,
                     Email = d.AppUser.Email,
                     BloodType = d.BloodType.ToString(),
-                    City = d.City,
+                    City = d.DonorCity,
+                    Country = d.DonorCountry,
+                    Longitude = d.DonorLongitude,
+                    Latitude = d.DonorLatitude,
                     IsAvailable = d.IsAvailable,
                     LastDonationDate = d.LastDonationDate
                 })
@@ -95,6 +102,11 @@ namespace E_PharmaHub.Repositories
         public void Delete(DonorProfile entity)
         {
             _context.DonorProfiles.Remove(entity);
+        }
+
+        public IQueryable<DonorProfile> GetQueryable()
+        {
+            return _context.DonorProfiles.Include(d => d.AppUser).AsQueryable();
         }
 
     }

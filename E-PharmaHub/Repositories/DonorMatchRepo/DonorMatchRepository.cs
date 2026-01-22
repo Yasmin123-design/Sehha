@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using System;
 
-namespace E_PharmaHub.Repositories
+namespace E_PharmaHub.Repositories.DonorMatchRepo
 {
     public class DonorMatchRepository : IDonorMatchRepository
     {
@@ -21,7 +21,7 @@ namespace E_PharmaHub.Repositories
 
             var matchingDonors = await _context.DonorProfiles
                 .Where(d => d.BloodType == request.RequiredType
-                            && d.City.ToLower() == request.City.ToLower()
+                            && d.DonorCity == request.HospitalCity.ToLower()
                             && d.IsAvailable)
                 .ToListAsync();
 
