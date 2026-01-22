@@ -1,6 +1,8 @@
-﻿namespace E_PharmaHub.Dtos
+using E_PharmaHub.Models.Enums;
+
+namespace E_PharmaHub.Dtos
 {
-    public class DonorReadDto
+    public class MyDonationResponseDto
     {
         public int Id { get; set; }
         public string BloodType { get; set; }
@@ -11,5 +13,6 @@
         public string? DonorTelephone { get; set; }
         public bool IsAvailable { get; set; }
         public DateTime? LastDonationDate { get; set; }
+        public BloodRequestResponseDto? BloodRequest { get; set; }
     }
 }

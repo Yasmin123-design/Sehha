@@ -30,7 +30,6 @@ namespace E_PharmaHub.Repositories.DonorRepo
                 .Select(d => new DonorReadDto
                 {
                     Id = d.Id,
-                    Email = d.AppUser.Email,
                     BloodType = d.BloodType.ToString(),
                     City = d.DonorCity,
                     Country = d.DonorCountry,
@@ -69,7 +68,6 @@ namespace E_PharmaHub.Repositories.DonorRepo
                 .Select(d => new DonorReadDto
                 {
                     Id = d.Id,
-                    Email = d.AppUser.Email,
                     BloodType = d.BloodType.ToString(),
                     City = d.DonorCity,
                     Country = d.DonorCountry,
