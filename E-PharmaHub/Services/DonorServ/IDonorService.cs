@@ -9,6 +9,7 @@ namespace E_PharmaHub.Services.DonorServ
         Task<IEnumerable<DonorReadDto>> GetAllDetailsAsync();
         Task<IEnumerable<DonorReadDto>> GetByFilterAsync(BloodType? type, string? city);
         Task<IEnumerable<DonorReadDto>> GetDonorsByRequestIdAsync(int requestId);
+        Task<IEnumerable<DonorReadDto>> GetMyDonationsAsync(string userId);
         Task<DonorProfile?> GetByUserIdAsync(string userId);
         Task<DonorReadDto> RegisterAsync(DonorRegisterDto donor);
         Task<bool> UpdateAvailabilityAsync(string userId, int donorId, bool isAvailable);

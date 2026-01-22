@@ -41,6 +41,16 @@ namespace E_PharmaHub.Controllers
             return Ok(donors);
         }
 
+        [HttpGet("my-donations")]
+        public async Task<IActionResult> MyDonations()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null) return Unauthorized();
+
+            var result = await _donorService.GetMyDonationsAsync(userId);
+            return Ok(result);
+        }
+
         [HttpPost("Donate")]
         public async Task<IActionResult> Register([FromBody] DonorRegisterDto dto)
         {
@@ -69,10 +79,10 @@ namespace E_PharmaHub.Controllers
         }
 
         [HttpPut("availability/{donorId}")]
-        public async Task<IActionResult> UpdateAvailability([FromBody] bool isAvailable , int donorId)
+        public async Task<IActionResult> UpdateAvailability([FromBody] UpdateAvailabilityDto dto , int donorId)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var success = await _donorService.UpdateAvailabilityAsync(userId, donorId, isAvailable);
+            var success = await _donorService.UpdateAvailabilityAsync(userId, donorId, dto.IsAvailable);
             if (!success) return NotFound("Donor not found or unauthorized.");
             return Ok(new { message = "Availability updated successfully." });
         }

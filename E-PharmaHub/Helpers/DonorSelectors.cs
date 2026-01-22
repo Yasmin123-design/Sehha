@@ -20,7 +20,8 @@ namespace E_PharmaHub.Helpers
                 Longitude = donor.DonorLongitude,
                 IsAvailable = donor.IsAvailable,
                 DonorTelephone = donor.DonorTelephone,
-                LastDonationDate = donor.LastDonationDate
+                LastDonationDate = donor.LastDonationDate,
+                BloodRequest = donor.BloodRequest?.ToBloodRequestResponseDto()
             };
         }
 
@@ -36,7 +37,24 @@ namespace E_PharmaHub.Helpers
                 Latitude = d.DonorLatitude,
                 Longitude = d.DonorLongitude,
                 IsAvailable = d.IsAvailable,
-                LastDonationDate = d.LastDonationDate
+                DonorTelephone = d.DonorTelephone,
+                LastDonationDate = d.LastDonationDate,
+                BloodRequest = d.BloodRequest != null ? new BloodRequestResponseDto
+                {
+                    Id = d.BloodRequest.Id,
+                    RequestedByUserId = d.BloodRequest.RequestedByUserId,
+                    RequestedByUserName = d.BloodRequest.RequestedBy.UserName,
+                    RequiredType = d.BloodRequest.RequiredType,
+                    City = d.BloodRequest.HospitalCity,
+                    Country = d.BloodRequest.HospitalCountry,
+                    Latitude = d.BloodRequest.HospitalLatitude,
+                    Longitude = d.BloodRequest.HospitalLongitude,
+                    HospitalName = d.BloodRequest.HospitalName,
+                    Units = d.BloodRequest.Units,
+                    NeedWithin = d.BloodRequest.NeedWithin,
+                    Fulfilled = d.BloodRequest.Fulfilled,
+                    CreatedAt = d.BloodRequest.CreatedAt
+                } : null
             });
         }
     }
