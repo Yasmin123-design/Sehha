@@ -65,7 +65,8 @@ namespace E_PharmaHub.Services.DonorServ
             var donor = new DonorProfile
             {
                 AppUserId = dto.UserId,
-                BloodRequestId = request.Id,
+                BloodRequestId = dto.BloodRequestId,
+                BloodType = request.RequiredType,
                 DonorCity = dto.City,
                 DonorCountry = dto.Country,
                 DonorLatitude = dto.Latitude,
