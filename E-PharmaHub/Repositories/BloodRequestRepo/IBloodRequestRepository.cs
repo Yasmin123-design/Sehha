@@ -5,5 +5,6 @@ namespace E_PharmaHub.Repositories.BloodRequestRepo
     public interface IBloodRequestRepository : IGenericRepository<BloodRequest>
     {
         Task<IEnumerable<BloodRequest>> GetUnfulfilledRequestsAsync();
+        Task<IEnumerable<BloodRequest>> GetByUserIdAsync(string userId);
     }
 }

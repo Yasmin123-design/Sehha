@@ -42,6 +42,16 @@ namespace E_PharmaHub.Controllers
             return Ok(result);
         }
 
+        [HttpGet("my-requests")]
+        public async Task<IActionResult> GetMyRequests()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null) return Unauthorized();
+
+            var result = await _bloodRequestService.GetMyRequestsAsync(userId);
+            return Ok(result);
+        }
+
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] BloodRequest request)
         {

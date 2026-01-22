@@ -50,6 +50,14 @@ namespace E_PharmaHub.Repositories.BloodRequestRepo
                 .Where(r => !r.Fulfilled)
                 .OrderByDescending(r => r.CreatedAt)
                 .ToListAsync();
+        public async Task<IEnumerable<BloodRequest>> GetByUserIdAsync(string userId)
+        {
+            return await _context.BloodRequests
+                .Include(r => r.Matches)
+                .Include(r => r.RequestedBy)
+                .Where(r => r.RequestedByUserId == userId)
+                .OrderByDescending(r => r.CreatedAt)
+                .ToListAsync();
         }
     }
 }

@@ -28,11 +28,16 @@ namespace E_PharmaHub.Services.BloodRequestServ
             return request?.ToBloodRequestResponseDto();
         }
 
+        public async Task<IEnumerable<BloodRequestResponseDto>> GetMyRequestsAsync(string userId)
+        {
+            var requests = await _unitOfWork.BloodRequest.GetByUserIdAsync(userId);
+            return requests.Select(r => r.ToBloodRequestResponseDto());
+        }
+
         public async Task<IEnumerable<BloodRequestResponseDto>> GetUnfulfilledRequestsAsync()
         {
             var requests = await _unitOfWork.BloodRequest.GetUnfulfilledRequestsAsync();
             return requests.Select(r => r.ToBloodRequestResponseDto());
-
         }
 
         public async Task<BloodRequest> AddRequestAsync(BloodRequest request)
