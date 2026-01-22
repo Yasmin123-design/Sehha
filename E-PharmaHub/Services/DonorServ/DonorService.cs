@@ -61,10 +61,11 @@ namespace E_PharmaHub.Services.DonorServ
 
         public async Task<DonorReadDto> RegisterAsync(DonorRegisterDto dto)
         {
+            var request = await _unitOfWork.BloodRequest.GetByIdAsync(dto.BloodRequestId);
             var donor = new DonorProfile
             {
                 AppUserId = dto.UserId,
-                BloodType = dto.BloodType,
+                BloodRequestId = request.Id,
                 DonorCity = dto.City,
                 DonorCountry = dto.Country,
                 DonorLatitude = dto.Latitude,

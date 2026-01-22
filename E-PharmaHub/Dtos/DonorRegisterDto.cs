@@ -10,7 +10,7 @@ namespace E_PharmaHub.Dtos
 
         [Required(ErrorMessage = "Blood type is required.")]
         [EnumDataType(typeof(BloodType), ErrorMessage = "Invalid blood type value.")]
-        public BloodType BloodType { get; set; }
+        public BloodType? BloodType { get; set; }
 
         [Required(ErrorMessage = "City is required.")]
         [StringLength(50, ErrorMessage = "City name must not exceed 50 characters.")]
