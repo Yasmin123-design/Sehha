@@ -111,12 +111,6 @@ namespace E_PharmaHub.Services.DonorServ
             if (donor == null)
                 throw new Exception("Donor not found");
 
-            var user = await _userManager.FindByIdAsync(donor.AppUserId);
-
-            _unitOfWork.Donors.Delete(donor);
-
-            if (user != null)
-                await _userManager.DeleteAsync(user);
             await _unitOfWork.CompleteAsync();
         }
     }
