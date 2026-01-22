@@ -75,7 +75,6 @@ namespace E_PharmaHub.Helpers
                 {
                     Id = d.BloodRequest.Id,
                     RequestedByUserId = d.BloodRequest.RequestedByUserId,
-                    RequestedByUserName = d.BloodRequest.RequestedBy.UserName,
                     RequiredType = d.BloodRequest.RequiredType,
                     City = d.BloodRequest.HospitalCity,
                     Country = d.BloodRequest.HospitalCountry,

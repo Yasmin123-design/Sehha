@@ -6,7 +6,6 @@ namespace E_PharmaHub.Dtos
     {
         public int Id { get; set; }
         public string? RequestedByUserId { get; set; }
-        public string? RequestedByUserName { get; set; }
         public BloodType RequiredType { get; set; }
         public string City { get; set; }
         public string Country { get; set; }
