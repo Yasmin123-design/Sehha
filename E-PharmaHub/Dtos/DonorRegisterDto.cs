@@ -5,10 +5,9 @@ namespace E_PharmaHub.Dtos
 {
     public class DonorRegisterDto
     {
-        public string UserId { get; set; }
+        public string? UserId { get; set; }
         public int BloodRequestId { get; set; }
 
-        [Required(ErrorMessage = "Blood type is required.")]
         [EnumDataType(typeof(BloodType), ErrorMessage = "Invalid blood type value.")]
         public BloodType? BloodType { get; set; }
 
