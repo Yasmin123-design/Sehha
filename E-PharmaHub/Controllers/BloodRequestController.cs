@@ -82,7 +82,7 @@ namespace E_PharmaHub.Controllers
             var success = await _bloodRequestService.UpdateRequestAsync(id, updatedRequest);
             if (!success) return BadRequest("Failed to update request.");
 
-            return Ok("Updated successfully");
+            return Ok(new { message = "Blood request Updated successfully!" });
         }
 
 
@@ -91,7 +91,7 @@ namespace E_PharmaHub.Controllers
         {
             var success = await _bloodRequestService.DeleteRequestAsync(id);
             if (!success) return NotFound();
-            return Ok("Deleted successfully");
+            return Ok(new { message = "Blood request Deleted successfully!" });
         }
     }
 
