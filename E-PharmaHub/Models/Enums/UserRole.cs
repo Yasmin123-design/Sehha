@@ -5,8 +5,7 @@
         RegularUser,
         Pharmacist,
         Doctor,
-        HealthProvider,
-        Donor,
+        BloodRequest,
         Admin
     }
 

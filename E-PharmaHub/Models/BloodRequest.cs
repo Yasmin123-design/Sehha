@@ -17,7 +17,6 @@ namespace E_PharmaHub.Models
         public string NeedWithin { get; set; }
         public bool Fulfilled { get; set; } = false;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
         public virtual AppUser? RequestedBy { get; set; }
         public virtual ICollection<DonorMatch>? Matches { get; set; }
     }
