@@ -10,6 +10,7 @@ namespace E_PharmaHub.Models
         public virtual AppUser? AppUser { get; set; }
         public string AppUserId { get; set; }
         public BloodType BloodType { get; set; }
+        public string? DonorTelephone { get; set; }
         public string DonorCity { get; set; }
         public string DonorCountry { get; set; }
         public double DonorLatitude { get; set; }

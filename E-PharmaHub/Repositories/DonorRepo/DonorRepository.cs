@@ -50,9 +50,9 @@ namespace E_PharmaHub.Repositories.DonorRepo
                 .FirstOrDefaultAsync(d => d.AppUserId == userId);
         }
 
-        public async Task<bool> UpdateAvailabilityAsync(string userId, bool isAvailable)
+        public async Task<bool> UpdateAvailabilityAsync(int donorId, bool isAvailable)
         {
-            var donor = await _context.DonorProfiles.FirstOrDefaultAsync(d => d.AppUserId == userId);
+            var donor = await _context.DonorProfiles.FindAsync(donorId);
             if (donor == null) return false;
 
             donor.IsAvailable = isAvailable;

@@ -7,6 +7,7 @@ namespace E_PharmaHub.Dtos
     {
         public string? UserId { get; set; }
         public int BloodRequestId { get; set; }
+        public string PhoneNumber { get; set; }
 
         [EnumDataType(typeof(BloodType), ErrorMessage = "Invalid blood type value.")]
         public BloodType? BloodType { get; set; }

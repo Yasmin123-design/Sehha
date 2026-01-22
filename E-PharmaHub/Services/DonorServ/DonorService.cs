@@ -67,6 +67,7 @@ namespace E_PharmaHub.Services.DonorServ
                 AppUserId = dto.UserId,
                 BloodRequestId = dto.BloodRequestId,
                 BloodType = request.RequiredType,
+                DonorTelephone = dto.PhoneNumber,
                 DonorCity = dto.City,
                 DonorCountry = dto.Country,
                 DonorLatitude = dto.Latitude,
@@ -80,9 +81,12 @@ namespace E_PharmaHub.Services.DonorServ
             return donor.ToDonorReadDto();
         }
 
-        public async Task<bool> UpdateAvailabilityAsync(string userId, bool isAvailable)
+        public async Task<bool> UpdateAvailabilityAsync(string userId, int donorId, bool isAvailable)
         {
-            var result = await _unitOfWork.Donors.UpdateAvailabilityAsync(userId, isAvailable);
+            var donor = await _unitOfWork.Donors.GetByIdAsync(donorId);
+            if (donor == null || donor.AppUserId != userId) return false;
+
+            var result = await _unitOfWork.Donors.UpdateAvailabilityAsync(donorId, isAvailable);
             await _unitOfWork.CompleteAsync();
             return result;
         }

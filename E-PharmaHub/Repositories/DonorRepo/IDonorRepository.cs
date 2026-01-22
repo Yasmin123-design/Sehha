@@ -8,7 +8,7 @@ namespace E_PharmaHub.Repositories.DonorRepo
     {
         Task<IEnumerable<DonorReadDto>> GetByFilterAsync(BloodType? type, string? city);
         Task<DonorProfile?> GetByUserIdAsync(string userId);
-        Task<bool> UpdateAvailabilityAsync(string userId, bool isAvailable);
+        Task<bool> UpdateAvailabilityAsync(int donorId, bool isAvailable);
         Task<IEnumerable<DonorReadDto>> GetAllDetailsAsync();
         IQueryable<DonorProfile> GetQueryable();
     }

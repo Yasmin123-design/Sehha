@@ -11,7 +11,7 @@ namespace E_PharmaHub.Services.DonorServ
         Task<IEnumerable<DonorReadDto>> GetDonorsByRequestIdAsync(int requestId);
         Task<DonorProfile?> GetByUserIdAsync(string userId);
         Task<DonorReadDto> RegisterAsync(DonorRegisterDto donor);
-        Task<bool> UpdateAvailabilityAsync(string userId, bool isAvailable);
+        Task<bool> UpdateAvailabilityAsync(string userId, int donorId, bool isAvailable);
         Task UpdateAsync(DonorProfile donor);
         Task DeleteAsync(int id);
     }

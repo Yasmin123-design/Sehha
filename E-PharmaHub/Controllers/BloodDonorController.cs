@@ -68,12 +68,12 @@ namespace E_PharmaHub.Controllers
 
         }
 
-        [HttpPut("availability")]
-        public async Task<IActionResult> UpdateAvailability([FromBody] bool isAvailable)
+        [HttpPut("availability/{donorId}")]
+        public async Task<IActionResult> UpdateAvailability([FromBody] bool isAvailable , int donorId)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var success = await _donorService.UpdateAvailabilityAsync(userId, isAvailable);
-            if (!success) return NotFound("Donor not found.");
+            var success = await _donorService.UpdateAvailabilityAsync(userId, donorId, isAvailable);
+            if (!success) return NotFound("Donor not found or unauthorized.");
             return Ok(new { message = "Availability updated successfully." });
         }
 

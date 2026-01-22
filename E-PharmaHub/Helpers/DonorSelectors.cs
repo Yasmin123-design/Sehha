@@ -19,6 +19,7 @@ namespace E_PharmaHub.Helpers
                 Latitude = donor.DonorLatitude,
                 Longitude = donor.DonorLongitude,
                 IsAvailable = donor.IsAvailable,
+                DonorTelephone = donor.DonorTelephone,
                 LastDonationDate = donor.LastDonationDate
             };
         }
