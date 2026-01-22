@@ -30,6 +30,13 @@ namespace E_PharmaHub.Controllers
             _inventoryService = inventoryService;
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            var result = await _medicineService.GetAllMedicineDtosAsync();
+            return Ok(result);
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {

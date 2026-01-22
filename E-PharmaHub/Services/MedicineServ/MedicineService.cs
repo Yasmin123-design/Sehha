@@ -39,6 +39,15 @@ namespace E_PharmaHub.Services.MedicineServ
             return await _unitOfWork.Medicines.GetAllAsync();
         }
 
+        public async Task<IEnumerable<MedicineDto>> GetAllMedicineDtosAsync()
+        {
+            var medications = await _unitOfWork.Medicines.GetAllAsync();
+            return medications
+                .SelectMany(m => m.Inventories
+                    .Select(inv => MedicineSelector.MapInventoryToDto(inv)))
+                .ToList();
+        }
+
         public async Task<Medication> GetMedicineByIdAsync(int id)
         {
             return await _unitOfWork.Medicines.GetByIdAsync(id);
