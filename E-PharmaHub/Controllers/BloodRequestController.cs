@@ -9,6 +9,8 @@ namespace E_PharmaHub.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "RegularUser,Admin")]
+
     public class BloodRequestController : ControllerBase
     {
         private readonly IBloodRequestService _bloodRequestService;
@@ -41,7 +43,6 @@ namespace E_PharmaHub.Controllers
         }
 
         [HttpPost]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> Create([FromBody] BloodRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -57,7 +58,6 @@ namespace E_PharmaHub.Controllers
 
 
         [HttpPut("{id}")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> Update(int id, [FromBody] BloodRequest updatedRequest)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -77,8 +77,6 @@ namespace E_PharmaHub.Controllers
 
 
         [HttpDelete("{id}")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-
         public async Task<IActionResult> Delete(int id)
         {
             var success = await _bloodRequestService.DeleteRequestAsync(id);

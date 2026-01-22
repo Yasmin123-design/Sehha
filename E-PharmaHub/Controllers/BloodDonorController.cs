@@ -10,6 +10,7 @@ namespace E_PharmaHub.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "RegularUser,Admin")]
     public class BloodDonorController : ControllerBase
     {
         private readonly IDonorService _donorService;
@@ -56,7 +57,6 @@ namespace E_PharmaHub.Controllers
         }
 
         [HttpPut("availability")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> UpdateAvailability([FromBody] bool isAvailable)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -65,7 +65,6 @@ namespace E_PharmaHub.Controllers
             return Ok("Availability updated successfully.");
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,Roles ="Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
