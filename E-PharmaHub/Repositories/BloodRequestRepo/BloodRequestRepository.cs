@@ -41,7 +41,6 @@ namespace E_PharmaHub.Repositories.BloodRequestRepo
         {
             _context.BloodRequests.Remove(entity);
         }
-
         public async Task<IEnumerable<BloodRequest>> GetUnfulfilledRequestsAsync()
         {
             return await _context.BloodRequests

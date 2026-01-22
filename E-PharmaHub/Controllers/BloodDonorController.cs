@@ -47,7 +47,7 @@ namespace E_PharmaHub.Controllers
                 var result = await _donorService.RegisterAsync(dto);
                 return Ok(new
                 {
-                    message = "Donor registered successfully!",
+                    message = "Donor Donated successfully!",
                 });
             }
             catch (Exception ex)
