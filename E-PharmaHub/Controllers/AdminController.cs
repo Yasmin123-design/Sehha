@@ -667,8 +667,10 @@ namespace E_PharmaHub.Controllers
             var existing = await _bloodRequestService.GetRequestByIdAsync(id);
             if (existing == null) return NotFound("Blood request not found.");
 
-            if (existing.RequestedByUserId != userId)
-                return Forbid("You are not allowed to update this request.");
+            var isAdmin = User.IsInRole("Admin");
+
+            if (existing.RequestedByUserId != userId && !isAdmin)
+                return StatusCode(403, "You are not allowed to update this request.");
 
             var success = await _bloodRequestService.UpdateRequestAsync(id, updatedRequest);
             if (!success) return BadRequest("Failed to update request.");
