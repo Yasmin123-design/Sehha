@@ -110,7 +110,7 @@ namespace E_PharmaHub.Services.DonorServ
             var donor = await _unitOfWork.Donors.GetByIdAsync(id);
             if (donor == null)
                 throw new Exception("Donor not found");
-
+            _unitOfWork.Donors.Delete(donor);
             await _unitOfWork.CompleteAsync();
         }
     }
