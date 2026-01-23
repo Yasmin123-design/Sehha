@@ -16,7 +16,7 @@ namespace E_PharmaHub.Models
         public double DonorLatitude { get; set; }
         public double DonorLongitude { get; set; }
         public bool IsAvailable { get; set; } = true;
-        public DateTime? LastDonationDate { get; set; } = new DateTime();
+        public DateTime? LastDonationDate { get; set; } = DateTime.UtcNow;
         public int BloodRequestId { get; set; }
         public virtual BloodRequest? BloodRequest { get; set; }
     }

@@ -122,9 +122,9 @@ namespace E_PharmaHub.Services.MedicineServ
 
                 _unitOfWork.Medicines.Delete(medicine);
             }
-
             await _unitOfWork.CompleteAsync();
         }
+
         public async Task<IEnumerable<MedicineDto>> SearchMedicinesByNameAsync(string name)
         {
             return await _unitOfWork.Medicines.SearchByNameAsync(name);
