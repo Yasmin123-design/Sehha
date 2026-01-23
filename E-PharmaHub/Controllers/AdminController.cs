@@ -15,6 +15,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using E_PharmaHub.Services.DonorServ;
+using E_PharmaHub.Services.BloodRequestServ;
+using E_PharmaHub.Models;
 
 namespace E_PharmaHub.Controllers
 {
@@ -35,6 +38,8 @@ namespace E_PharmaHub.Controllers
         private readonly INotificationService _notificationService;
         private readonly IAdminDashboardService _adminDashboardService;
         private readonly IChatService _chatService;
+        private readonly IDonorService _donorService;
+        private readonly IBloodRequestService _bloodRequestService;
         public AdminController(
             IDoctorService doctorService,
             IPharmacistService pharmacistService,
@@ -47,7 +52,9 @@ namespace E_PharmaHub.Controllers
             IPaymentService paymentService,
             INotificationService notificationService,
             IAdminDashboardService adminDashboardService,
-            IChatService chatService
+            IChatService chatService,
+            IDonorService donorService,
+            IBloodRequestService bloodRequestService
             )
         {
             _doctorService = doctorService;
@@ -62,6 +69,8 @@ namespace E_PharmaHub.Controllers
             _userService = userService;
             _adminDashboardService = adminDashboardService;
             _chatService = chatService;
+            _donorService = donorService;
+            _bloodRequestService = bloodRequestService;
         }
         [HttpGet("allDoctorsShowToAdmin")]
         public async Task<IActionResult> GetAllDoctorsShowToAdmin()
@@ -506,20 +515,6 @@ namespace E_PharmaHub.Controllers
 
             return Ok(new { message });
         }
-
-
-
-
-        //[HttpDelete("deleteuser/{userId}")]
-        //public async Task<IActionResult> DeleteUser(string userId)
-        //{
-        //    var success = await _userService.DeleteUserAsync(userId);
-
-        //    if (!success)
-        //        return NotFound("User not found");
-
-        //    return Ok("User deleted successfully");
-        //}
         [HttpGet("dashboard-stats")]
         public async Task<IActionResult> GetDashboardStats()
         {
@@ -631,6 +626,62 @@ namespace E_PharmaHub.Controllers
 
             var threads = await _chatService.GetUserThreadsAsync(userId);
             return Ok(threads);
+        }
+        [HttpGet("blooddonor/getall")]
+        public async Task<IActionResult> GetAllBloodDonor()
+        {
+            var donors = await _donorService.GetAllDetailsAsync();
+            return Ok(donors);
+        }
+        [HttpDelete("blooddonor/{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            await _donorService.DeleteAsync(id);
+            return Ok(new { message = "Donor deleted successfully" });
+        }
+        [HttpGet("blooddonor/getbyrequestid/{requestId}")]
+        public async Task<IActionResult> GetByRequestId(int requestId)
+        {
+            var donors = await _donorService.GetDonorsByRequestIdAsync(requestId);
+            return Ok(donors);
+        }
+        [HttpGet("bloodrequest/getall")]
+        public async Task<IActionResult> GetAllBloodRequest()
+        {
+            var result = await _bloodRequestService.GetAllBloodRequestsDtoAsync();
+            return Ok(result);
+        }
+        [HttpGet("bloodrequest/{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var request = await _bloodRequestService.GetRequestByIdAsync(id);
+            if (request == null) return NotFound();
+            return Ok(request);
+        }
+        [HttpPut("bloodrequest/{id}")]
+        public async Task<IActionResult> UpdateBloodRequest(int id, [FromBody] BloodRequest updatedRequest)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null) return Unauthorized();
+
+            var existing = await _bloodRequestService.GetRequestByIdAsync(id);
+            if (existing == null) return NotFound("Blood request not found.");
+
+            if (existing.RequestedByUserId != userId)
+                return Forbid("You are not allowed to update this request.");
+
+            var success = await _bloodRequestService.UpdateRequestAsync(id, updatedRequest);
+            if (!success) return BadRequest("Failed to update request.");
+
+            return Ok(new { message = "Blood request Updated successfully!" });
+        }
+
+        [HttpDelete("bloodrequest/{id}")]
+        public async Task<IActionResult> DeleteBloodRequest(int id)
+        {
+            var success = await _bloodRequestService.DeleteRequestAsync(id);
+            if (!success) return NotFound();
+            return Ok(new { message = "Blood request Deleted successfully!" });
         }
     }
 }

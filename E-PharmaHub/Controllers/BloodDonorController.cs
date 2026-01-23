@@ -20,13 +20,6 @@ namespace E_PharmaHub.Controllers
             _donorService = donorService;
         }
 
-        //[HttpGet]
-        //public async Task<IActionResult> GetAll()
-        //{
-        //    var donors = await _donorService.GetAllDetailsAsync();
-        //    return Ok(donors);
-        //}
-
         //[HttpGet("filter")]
         //public async Task<IActionResult> Filter([FromQuery] BloodType? type, [FromQuery] string? city)
         //{
