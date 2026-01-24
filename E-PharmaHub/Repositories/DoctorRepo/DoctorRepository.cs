@@ -214,10 +214,6 @@ namespace E_PharmaHub.Repositories.DoctorRepo
             await _context.DoctorAvailabilities.AddAsync(availability);
         }
 
-        public async Task Update(DoctorAvailability entity)
-        {
-            _context.DoctorProfiles.Update(entity);
-        }
 
         public async Task UpdateAvailabilityAsync(DoctorAvailability availability)
         {
