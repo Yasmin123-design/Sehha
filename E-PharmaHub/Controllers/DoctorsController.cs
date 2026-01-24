@@ -113,7 +113,6 @@ namespace E_PharmaHub.Controllers
             return Ok(doctors);
         }
 
-
         [HttpGet("top-doctors")]
         public async Task<IActionResult> GetTopDoctors()
         {
@@ -230,6 +229,11 @@ namespace E_PharmaHub.Controllers
     AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
     Roles = "Doctor"
 )]
+        [HttpGet("GetClinicOfDoctor")]
+        [Authorize(
+    AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
+    Roles = "Doctor"
+)]
         public async Task<IActionResult> GetClinicOfDoctor()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -239,7 +243,40 @@ namespace E_PharmaHub.Controllers
             return Ok(clinic);
         }
 
+        [HttpPost("availability")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Doctor")]
+        public async Task<IActionResult> AddAvailability(DoctorAvailabilityDto dto)
+        {
+            var (success, message) = await _doctorService.AddAvailabilityAsync(userId, dto);
+            if (!success) return BadRequest(new { message });
+            return Ok(new { message });
+        }
 
+        [HttpPut("availability/{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Doctor")]
+        public async Task<IActionResult> UpdateAvailability(int id, DoctorAvailabilityDto dto)
+        {
+            var (success, message) = await _doctorService.UpdateAvailabilityAsync(userId, id, dto);
+            if (!success) return BadRequest(new { message });
+            return Ok(new { message });
+        }
+
+        [HttpDelete("availability/{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Doctor")]
+        public async Task<IActionResult> DeleteAvailability(int id)
+        {
+            var (success, message) = await _doctorService.DeleteAvailabilityAsync(userId, id);
+            if (!success) return BadRequest(new { message });
+            return Ok(new { message });
+        }
+
+        [HttpGet("my-availabilities")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Doctor")]
+        public async Task<IActionResult> GetMyAvailabilities()
+        {
+            var availabilities = await _doctorService.GetMyAvailabilitiesAsync(userId);
+            return Ok(availabilities);
+        }
 
     }
 }

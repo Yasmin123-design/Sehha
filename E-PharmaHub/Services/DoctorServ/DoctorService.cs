@@ -384,6 +384,85 @@ namespace E_PharmaHub.Services.DoctorServ
             var doctors = await _unitOfWork.Doctors.GetTopRatedDoctorsAsync(3);
             return doctors;
         }
-    }
 
+        public async Task<(bool Success, string Message)> AddAvailabilityAsync(string userId, DoctorAvailabilityDto dto)
+        {
+            var doctor = await _unitOfWork.Doctors.GetDoctorByUserIdAsync(userId);
+            if (doctor == null) return (false, "Doctor not found.");
+
+            var availability = new DoctorAvailability
+            {
+                DoctorProfileId = doctor.Id,
+                DayOfWeek = dto.DayOfWeek,
+                StartTime = dto.StartTime,
+                EndTime = dto.EndTime,
+                SlotDurationInMinutes = dto.SlotDurationInMinutes
+            };
+
+            await _unitOfWork.Doctors.AddAvailabilityAsync(availability);
+            await _unitOfWork.CompleteAsync();
+
+            return (true, "Availability added successfully.");
+        }
+
+        public async Task<(bool Success, string Message)> UpdateAvailabilityAsync(string userId, int id, DoctorAvailabilityDto dto)
+        {
+            var doctor = await _unitOfWork.Doctors.GetDoctorByUserIdAsync(userId);
+            if (doctor == null) return (false, "Doctor not found.");
+
+            var availability = await _unitOfWork.Doctors.GetAvailabilityByIdAsync(id);
+            if (availability == null) return (false, "Availability record not found.");
+
+            if (availability.DoctorProfileId != doctor.Id)
+                return (false, "You are not authorized to update this availability.");
+
+            availability.DayOfWeek = dto.DayOfWeek;
+            availability.StartTime = dto.StartTime;
+            availability.EndTime = dto.EndTime;
+            availability.SlotDurationInMinutes = dto.SlotDurationInMinutes;
+
+            await _unitOfWork.Doctors.UpdateAvailabilityAsync(availability);
+            await _unitOfWork.CompleteAsync();
+
+            return (true, "Availability updated successfully.");
+        }
+
+        public async Task<(bool Success, string Message)> DeleteAvailabilityAsync(string userId, int id)
+        {
+            var doctor = await _unitOfWork.Doctors.GetDoctorByUserIdAsync(userId);
+            if (doctor == null) return (false, "Doctor not found.");
+
+            var availability = await _unitOfWork.Doctors.GetAvailabilityByIdAsync(id);
+            if (availability == null) return (false, "Availability record not found.");
+
+            if (availability.DoctorProfileId != doctor.Id)
+                return (false, "You are not authorized to delete this availability.");
+
+            await _unitOfWork.Doctors.DeleteAvailabilityAsync(availability);
+            await _unitOfWork.CompleteAsync();
+
+            return (true, "Availability deleted successfully.");
+        }
+
+        public async Task<IEnumerable<DoctorAvailabilityDto>> GetMyAvailabilitiesAsync(string userId)
+        {
+            var doctor = await _unitOfWork.Doctors.GetDoctorByUserIdAsync(userId);
+            if (doctor == null) return Enumerable.Empty<DoctorAvailabilityDto>();
+
+            var availabilities = await _unitOfWork.Doctors.GetByDoctorIdAsync(doctor.Id); // I need to add this to repo too or use a generic one if possible. 
+            // Wait, I already have GetByDoctorAndDayAsync, but I need all. Let me check if I can add GetByDoctorIdAsync.
+            
+            // Re-checking DoctorRepository/IDoctorRepository to see if I should add GetByDoctorIdAsync
+            // Actually, I'll just use the context or add it now.
+            
+            return availabilities.Select(a => new DoctorAvailabilityDto
+            {
+                Id = a.Id,
+                DayOfWeek = a.DayOfWeek,
+                StartTime = a.StartTime,
+                EndTime = a.EndTime,
+                SlotDurationInMinutes = a.SlotDurationInMinutes
+            });
+        }
+    }
 }

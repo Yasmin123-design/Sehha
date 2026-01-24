@@ -23,5 +23,10 @@ namespace E_PharmaHub.Repositories.DoctorRepo
         Task<bool> ApproveDoctorAsync(int id);
         Task<bool> RejectDoctorAsync(int id);
         Task<IEnumerable<DoctorReadDto>> GetTopRatedDoctorsAsync(int count);
+        Task AddAvailabilityAsync(DoctorAvailability availability);
+        Task UpdateAvailabilityAsync(DoctorAvailability availability);
+        Task DeleteAvailabilityAsync(DoctorAvailability availability);
+        Task<DoctorAvailability?> GetAvailabilityByIdAsync(int id);
+        Task<IEnumerable<DoctorAvailability>> GetByDoctorIdAsync(int doctorId);
     }
 }

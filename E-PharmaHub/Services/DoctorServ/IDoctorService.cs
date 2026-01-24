@@ -32,5 +32,10 @@ namespace E_PharmaHub.Services.DoctorServ
         Task<(bool success, string message)> ApproveDoctorAsync(int doctorId);
         Task<(bool success, string message)> RejectDoctorAsync(int doctorId);
         Task<IEnumerable<DoctorReadDto>> GetTopRatedDoctorsAsync();
+
+        Task<(bool Success, string Message)> AddAvailabilityAsync(string userId, DoctorAvailabilityDto dto);
+        Task<(bool Success, string Message)> UpdateAvailabilityAsync(string userId, int id, DoctorAvailabilityDto dto);
+        Task<(bool Success, string Message)> DeleteAvailabilityAsync(string userId, int id);
+        Task<IEnumerable<DoctorAvailabilityDto>> GetMyAvailabilitiesAsync(string userId);
     }
 }

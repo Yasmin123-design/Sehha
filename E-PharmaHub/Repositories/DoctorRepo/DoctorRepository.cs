@@ -209,5 +209,37 @@ namespace E_PharmaHub.Repositories.DoctorRepo
             return doctors;
         }
 
+        public async Task AddAvailabilityAsync(DoctorAvailability availability)
+        {
+            await _context.DoctorAvailabilities.AddAsync(availability);
+        }
+
+        public async Task Update(DoctorAvailability entity)
+        {
+            _context.DoctorProfiles.Update(entity);
+        }
+
+        public async Task UpdateAvailabilityAsync(DoctorAvailability availability)
+        {
+            _context.DoctorAvailabilities.Update(availability);
+        }
+
+        public async Task DeleteAvailabilityAsync(DoctorAvailability availability)
+        {
+            _context.DoctorAvailabilities.Remove(availability);
+        }
+
+        public async Task<DoctorAvailability?> GetAvailabilityByIdAsync(int id)
+        {
+            return await _context.DoctorAvailabilities.FindAsync(id);
+        }
+
+        public async Task<IEnumerable<DoctorAvailability>> GetByDoctorIdAsync(int doctorId)
+        {
+            return await _context.DoctorAvailabilities
+                .Where(a => a.DoctorProfileId == doctorId)
+                .ToListAsync();
+        }
+
     }
 }
