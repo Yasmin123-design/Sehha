@@ -62,7 +62,7 @@ namespace E_PharmaHub.Controllers
 
             request.RequestedByUserId = userId;
 
-            var newRequest = await _bloodRequestService.AddRequestAsync(request);
+            var newRequest = await _bloodRequestService.AddRequestAsync(request,userId);
             return Ok(new { message = "Blood request created successfully!"});
         }
 

@@ -9,7 +9,7 @@ namespace E_PharmaHub.Services.BloodRequestServ
         Task<BloodRequestResponseDto?> GetRequestByIdAsync(int id);
         Task<IEnumerable<BloodRequestResponseDto>> GetUnfulfilledRequestsAsync();
         Task<IEnumerable<BloodRequestResponseDto>> GetMyRequestsAsync(string userId);
-        Task<BloodRequest> AddRequestAsync(BloodRequest request);
+        Task<BloodRequest> AddRequestAsync(BloodRequest request , string userId);
         Task<bool> UpdateRequestAsync(int id, BloodRequest updatedRequest);
         Task<bool> DeleteRequestAsync(int id);
     }

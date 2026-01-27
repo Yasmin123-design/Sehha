@@ -46,13 +46,13 @@ namespace E_PharmaHub.Services.BloodRequestServ
             return requests.Select(r => r.ToBloodRequestResponseDto());
         }
 
-        public async Task<BloodRequest> AddRequestAsync(BloodRequest request)
+        public async Task<BloodRequest> AddRequestAsync(BloodRequest request , string userId)
         {
             await _unitOfWork.BloodRequest.AddAsync(request);
             await _unitOfWork.CompleteAsync();
 
             var regularUsers = (await _unitOfWork.Useres.GetAllAsync())
-                .Where(u => u.Role == UserRole.RegularUser);
+                .Where(u => u.Role == UserRole.RegularUser && u.Id != userId);
 
             foreach (var user in regularUsers)
             {
