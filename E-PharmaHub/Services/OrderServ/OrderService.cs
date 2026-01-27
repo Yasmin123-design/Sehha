@@ -141,8 +141,8 @@ namespace E_PharmaHub.Services.OrderServ
             {
                 Success = true,
                 Message = isNewOrder
-                    ? "Checkout completed. New order created successfully!."
-                    : "Pending order updated with new items successfully!.",
+                    ? "Checkout completed. New order created successfully."
+                    : "Pending order updated with new items successfully.",
                 Data = new
                 {
                     OrderId = existingOrder.Id,
