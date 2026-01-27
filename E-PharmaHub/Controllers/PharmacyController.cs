@@ -155,5 +155,15 @@ namespace E_PharmaHub.Controllers
             return Ok(result);
         }
 
+        [HttpGet("search")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "RegularUser")]
+        public async Task<IActionResult> Search([FromQuery] string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                return BadRequest("Pharmacy name is required for search.");
+
+            var result = await _pharmacyService.SearchPharmacyByNameAsync(name);
+            return Ok(result);
+        }
     }
 }

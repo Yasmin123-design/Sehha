@@ -13,6 +13,7 @@ namespace E_PharmaHub.Repositories.PharmacyRepo
         Task<IEnumerable<PharmacySimpleDto>> GetTopRatedPharmaciesAsync(int count);
         Task<IEnumerable<PharmacySimpleDto>> GetNearestPharmaciesWithMedicationAsync(
     string medicationName, double userLat, double userLng);
+        Task<IEnumerable<PharmacySimpleDto>> SearchByNameAsync(string name);
 
 
     }

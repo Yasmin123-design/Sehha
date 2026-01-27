@@ -12,6 +12,7 @@ namespace E_PharmaHub.Services.PharmacyServ
         Task DeletePharmacyAsync(int id);
         Task<IEnumerable<PharmacySimpleDto>> GetTopRatedPharmaciesAsync();
         Task<IEnumerable<PharmacySimpleDto>> GetNearestPharmaciesWithMedicationAsync(string medicationName, double userLat, double userLng);
+        Task<IEnumerable<PharmacySimpleDto>> SearchPharmacyByNameAsync(string name);
 
         Task<(bool Success, string Message)> UpdatePharmacyAsync(int id, PharmacyUpdateDto dto, IFormFile? image);
 

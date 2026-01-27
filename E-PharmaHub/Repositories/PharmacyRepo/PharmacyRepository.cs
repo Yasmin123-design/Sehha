@@ -141,6 +141,14 @@ namespace E_PharmaHub.Repositories.PharmacyRepo
             return pharmacies;
         }
 
+        public async Task<IEnumerable<PharmacySimpleDto>> SearchByNameAsync(string name)
+        {
+            return await BasePharmacyIncludes()
+                .Where(p => p.Name.Contains(name) && _context.Pharmacists.Any(ph => ph.PharmacyId == p.Id && ph.IsApproved))
+                .Select(PharmacySelectors.PharmacySimpleDtoSelector)
+                .ToListAsync();
+        }
+
     }
 }
 
