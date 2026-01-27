@@ -147,25 +147,6 @@ namespace E_PharmaHub.Services.PaymentServ
                     {
                         order.PaymentStatus = PaymentStatus.Captured;
 
-                        foreach (var item in order.Items)
-                        {
-                            var inventoryItem = await _unitOfWork.IinventoryItem
-                                .GetByPharmacyAndMedicationAsync(order.PharmacyId, item.MedicationId);
-
-                            if (inventoryItem != null)
-                            {
-                                inventoryItem.Quantity -= item.Quantity;
-                                if (inventoryItem.Quantity < 0)
-                                    inventoryItem.Quantity = 0;
-
-
-                                inventoryItem.Pharmacy = null;
-                                inventoryItem.Medication = null;
-
-                                await _unitOfWork.IinventoryItem.Update(inventoryItem);
-                            }
-                        }
-
                         await _unitOfWork.CompleteAsync();
                     }
                     break;
