@@ -100,11 +100,14 @@ namespace E_PharmaHub.Services.NotificationServ
                          || n.Type == NotificationType.AppointmentRejected
                          || n.Type == NotificationType.AppointmentReminder
                          || n.Type == NotificationType.AppointmentStartingSoon);
-
+            var userBlood = notifications
+                .Where(n => n.Type == NotificationType.BloodRequest
+                         || n.Type == NotificationType.BloodDonation);
             return new
             {
                 Orders = orders,
-                Appointments = appointments
+                Appointments = appointments,
+                UserBlood = userBlood
             };
         }
 
