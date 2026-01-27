@@ -136,6 +136,7 @@ namespace E_PharmaHub.Services.PharmacyServ
         {
             var pharmacies = await _unitOfWork.Pharmacies.GetTopRatedPharmaciesAsync(3);
             return pharmacies;
+        }
         public async Task<IEnumerable<PharmacySimpleDto>> SearchPharmacyByNameAsync(string name)
         {
             return await _unitOfWork.Pharmacies.SearchByNameAsync(name);
