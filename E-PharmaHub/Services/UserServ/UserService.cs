@@ -137,7 +137,8 @@ namespace E_PharmaHub.Services.UserServ
                 UserName = user.UserName,
                 PhoneNumber = user.PhoneNumber,
                 ProfileImage = user.ProfileImage,
-                Address = user.Address
+                Address = user.Address,
+                Role = user.Role.ToString()
             };
         }
 
