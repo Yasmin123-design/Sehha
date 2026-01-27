@@ -3,6 +3,7 @@ using E_PharmaHub.Helpers;
 using E_PharmaHub.Models;
 using E_PharmaHub.Models.Enums;
 using E_PharmaHub.Services.PaymentServ;
+using E_PharmaHub.Services.NotificationServ;
 using E_PharmaHub.UnitOfWorkes;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -14,15 +15,18 @@ namespace E_PharmaHub.Services.DonorServ
         private readonly IUnitOfWork _unitOfWork;
         private readonly UserManager<AppUser> _userManager;
         private readonly IPaymentService _paymentService;
+        private readonly INotificationService _notificationService;
 
         public DonorService(IUnitOfWork unitOfWork,
             UserManager<AppUser> userManager,
-            IPaymentService paymentService
+            IPaymentService paymentService,
+            INotificationService notificationService
             )
         {
             _unitOfWork = unitOfWork;
             _userManager = userManager;
             _paymentService = paymentService;
+            _notificationService = notificationService;
         }
 
         public async Task<IEnumerable<DonorReadDto>> GetAllDetailsAsync()
@@ -87,6 +91,16 @@ namespace E_PharmaHub.Services.DonorServ
 
             await _unitOfWork.Donors.AddAsync(donor);
             await _unitOfWork.CompleteAsync();
+
+            if (request != null && !string.IsNullOrEmpty(request.RequestedByUserId))
+            {
+                await _notificationService.CreateAndSendAsync(
+                    userId: request.RequestedByUserId,
+                    title: "Blood Donation Received",
+                    message: $"Someone has donated for your {request.RequiredType} blood request.Check your blood donations part.",
+                    type: NotificationType.BloodDonation
+                );
+            }
 
             return donor.ToDonorReadDto();
         }

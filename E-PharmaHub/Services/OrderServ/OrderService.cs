@@ -103,7 +103,7 @@ namespace E_PharmaHub.Services.OrderServ
                         });
                 }
 
-                existingOrder.TotalPrice = totalPrice;
+                existingOrder.TotalPrice += itemsTotal;
                 existingOrder.City = dto.City;
                 existingOrder.Country = dto.Country;
                 existingOrder.Street = dto.Street;

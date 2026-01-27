@@ -68,6 +68,7 @@ using E_PharmaHub.Services.BloodRequestServ;
 using E_PharmaHub.Repositories.BloodRequestRepo;
 using E_PharmaHub.Repositories.DonorRepo;
 using E_PharmaHub.Services.DonorServ;
+using E_PharmaHub.Services.ChatBotServ;
 
 namespace E_PharmaHub
 {
@@ -176,6 +177,8 @@ namespace E_PharmaHub
                 var connectionString = builder.Configuration.GetConnectionString("AzureBlobStorage");
                 return new BlobServiceClient(connectionString);
             });
+            builder.Services.AddHttpClient();
+            builder.Services.AddScoped<ChatBotService>();
 
             builder.Services.AddScoped<IMedicineRepository, MedicineRepository>();
             builder.Services.AddScoped<IMedicineService, MedicineService>();

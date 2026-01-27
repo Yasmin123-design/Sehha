@@ -1,7 +1,10 @@
 ﻿using E_PharmaHub.Dtos;
 using E_PharmaHub.Helpers;
 using E_PharmaHub.Models;
+using E_PharmaHub.Models.Enums;
 using E_PharmaHub.Repositories;
+using E_PharmaHub.Repositories.NotificationRepo;
+using E_PharmaHub.Services.NotificationServ;
 using E_PharmaHub.UnitOfWorkes;
 
 namespace E_PharmaHub.Services.BloodRequestServ
@@ -9,10 +12,13 @@ namespace E_PharmaHub.Services.BloodRequestServ
     public class BloodRequestService : IBloodRequestService
     {
         private readonly IUnitOfWork _unitOfWork;
-
-        public BloodRequestService(IUnitOfWork unitOfWork)
+        private readonly INotificationService _notificationService;
+        public BloodRequestService(
+            IUnitOfWork unitOfWork,
+            INotificationService notificationService)
         {
             _unitOfWork = unitOfWork;
+            _notificationService = notificationService;
         }
 
 
@@ -44,6 +50,20 @@ namespace E_PharmaHub.Services.BloodRequestServ
         {
             await _unitOfWork.BloodRequest.AddAsync(request);
             await _unitOfWork.CompleteAsync();
+
+            var regularUsers = (await _unitOfWork.Useres.GetAllAsync())
+                .Where(u => u.Role == UserRole.RegularUser);
+
+            foreach (var user in regularUsers)
+            {
+                await _notificationService.CreateAndSendAsync(
+                    userId: user.Id,
+                    title: "Blood Request",
+                    message: $"There is a new blood request for blood type {request.RequiredType}.",
+                    type: NotificationType.BloodRequest
+                );
+            }
+
             return request;
         }
 

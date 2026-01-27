@@ -9,6 +9,8 @@
         OrderConfirmed,
         OrderCancelled,
         OrderDelivered,
+        BloodRequest,
+        BloodDonation,
         NewAppointmentForDoctor,
         NewOrderForPharmacist,
         InventoryOutOfStock,
