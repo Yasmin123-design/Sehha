@@ -276,7 +276,7 @@ namespace E_PharmaHub.Repositories.InventoryItemRepo
             if (inventory != null)
             {
                 inventory.Quantity -= quantity;
-                _context.InventoryItems.Update(inventory);
+                _context.Entry(inventory).Property(x => x.Quantity).IsModified = true;
             }
         }
         public async Task<List<CategoryItemsCountDto>> GetItemsCountByCategoryAsync(
