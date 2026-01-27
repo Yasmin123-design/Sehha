@@ -144,7 +144,7 @@ namespace E_PharmaHub.Repositories.PharmacyRepo
         public async Task<IEnumerable<PharmacySimpleDto>> SearchByNameAsync(string name)
         {
             return await BasePharmacyIncludes()
-                .Where(p => p.Name.Contains(name) && _context.Pharmacists.Any(ph => ph.PharmacyId == p.Id && ph.IsApproved))
+                .Where(p => p.Name == name && _context.Pharmacists.Any(ph => ph.PharmacyId == p.Id && ph.IsApproved))
                 .Select(PharmacySelectors.PharmacySimpleDtoSelector)
                 .ToListAsync();
         }
