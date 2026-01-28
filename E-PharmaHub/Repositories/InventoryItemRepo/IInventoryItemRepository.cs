@@ -19,6 +19,7 @@ namespace E_PharmaHub.Repositories.InventoryItemRepo
         Task<int> GetLowStockCountAsync(int pharmacyId, int threshold = 5);
         Task<int> GetOutOfStockCountAsync(int pharmacyId);
         Task<InventoryItem> GetInventoryForCheckoutAsync(int medicationId, int pharmacyId, decimal price);
+        Task<List<InventoryItem>> GetInventoriesForCheckoutAsync(IEnumerable<int> medicationIds, int pharmacyId);
         Task DecreaseQuantityAsync(int inventoryId, int quantity);
         Task<IEnumerable<InventoryItem>> GetAllAsync();
         Task<IEnumerable<MedicineDto>> GetAlternativeMedicinesAsync(string name);

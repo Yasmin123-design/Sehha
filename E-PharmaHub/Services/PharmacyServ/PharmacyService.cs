@@ -2,6 +2,7 @@
 using E_PharmaHub.Models;
 using E_PharmaHub.Services.FileStorageServ;
 using E_PharmaHub.UnitOfWorkes;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace E_PharmaHub.Services.PharmacyServ
 {
@@ -9,11 +10,13 @@ namespace E_PharmaHub.Services.PharmacyServ
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IFileStorageService _fileStorage;
+        private readonly IMemoryCache _cache;
 
-        public PharmacyService(IUnitOfWork unitOfWork, IFileStorageService fileStorage)
+        public PharmacyService(IUnitOfWork unitOfWork, IFileStorageService fileStorage, IMemoryCache cache)
         {
             _unitOfWork = unitOfWork;
             _fileStorage = fileStorage;
+            _cache = cache;
         }
 
         public async Task<(bool Success, string Message)> UpdatePharmacyAsync(
@@ -85,6 +88,8 @@ namespace E_PharmaHub.Services.PharmacyServ
             _unitOfWork.PharmasistsProfile.Update(pharmacist);
             await _unitOfWork.CompleteAsync();
 
+            _cache.Remove($"pharmacy_brief_{id}");
+
             return (true, "Pharmacy updated successfully ✅");
         }
 
@@ -94,9 +99,26 @@ namespace E_PharmaHub.Services.PharmacyServ
             return pharmacies ?? Enumerable.Empty<PharmacySimpleDto>();
         }
 
-        public async Task<PharmacySimpleDto> GetPharmacyByIdAsync(int id)
+        public async ValueTask<PharmacySimpleDto?> GetPharmacyByIdAsync(int id)
         {
-            return await _unitOfWork.Pharmacies.GetByIdBriefAsync(id);
+            string cacheKey = $"pharmacy_brief_{id}";
+
+            if (!_cache.TryGetValue(cacheKey, out PharmacySimpleDto? pharmacy))
+            {
+                pharmacy = await _unitOfWork.Pharmacies.GetByIdBriefAsync(id);
+
+                if (pharmacy != null)
+                {
+                    var cacheOptions = new MemoryCacheEntryOptions()
+                        .SetSlidingExpiration(TimeSpan.FromMinutes(10))
+                        .SetAbsoluteExpiration(TimeSpan.FromHours(1))
+                        .SetSize(1);
+
+                    _cache.Set(cacheKey, pharmacy, cacheOptions);
+                }
+            }
+
+            return pharmacy;
         }
 
         public async Task AddPharmacyAsync(Pharmacy pharmacy, IFormFile imageFile)
@@ -109,9 +131,6 @@ namespace E_PharmaHub.Services.PharmacyServ
             await _unitOfWork.Pharmacies.AddAsync(pharmacy);
             await _unitOfWork.CompleteAsync();
         }
-
-
-
         public async Task DeletePharmacyAsync(int id)
         {
             var pharmacy = await _unitOfWork.Pharmacies.GetByIdAsync(id);
@@ -121,7 +140,6 @@ namespace E_PharmaHub.Services.PharmacyServ
                 await _unitOfWork.CompleteAsync();
             }
         }
-
         public async Task<IEnumerable<PharmacySimpleDto>> GetNearestPharmaciesWithMedicationAsync(string medicationName, double userLat, double userLng)
         {
             return await _unitOfWork.Pharmacies.GetNearestPharmaciesWithMedicationAsync(medicationName, userLat, userLng);

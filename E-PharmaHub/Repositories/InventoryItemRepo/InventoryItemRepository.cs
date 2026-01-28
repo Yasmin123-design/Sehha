@@ -270,6 +270,15 @@ namespace E_PharmaHub.Repositories.InventoryItemRepo
                     i.Price == price);
         }
 
+        public async Task<List<InventoryItem>> GetInventoriesForCheckoutAsync(IEnumerable<int> medicationIds, int pharmacyId)
+        {
+            return await _context.InventoryItems
+                .Where(i =>
+                    medicationIds.Contains(i.MedicationId) &&
+                    i.PharmacyId == pharmacyId)
+                .ToListAsync();
+        }
+
         public async Task DecreaseQuantityAsync(int inventoryId, int quantity)
         {
             var inventory = await _context.InventoryItems.FindAsync(inventoryId);

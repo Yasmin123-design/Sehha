@@ -4,6 +4,7 @@ using E_PharmaHub.Models;
 using E_PharmaHub.Models.Enums;
 using E_PharmaHub.Services.FileStorageServ;
 using E_PharmaHub.UnitOfWorkes;
+using Microsoft.Extensions.Caching.Memory;
 using System.ComponentModel;
 
 namespace E_PharmaHub.Services.MedicineServ
@@ -12,11 +13,13 @@ namespace E_PharmaHub.Services.MedicineServ
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IFileStorageService _fileStorage;
+        private readonly IMemoryCache _cache;
 
-        public MedicineService(IUnitOfWork unitOfWork, IFileStorageService fileStorage)
+        public MedicineService(IUnitOfWork unitOfWork, IFileStorageService fileStorage, IMemoryCache cache)
         {
             _unitOfWork = unitOfWork;
             _fileStorage = fileStorage;
+            _cache = cache;
         }
         public async Task<IEnumerable<MedicineDto>> FilterMedicationsAsync(
             string? name,
@@ -49,9 +52,26 @@ namespace E_PharmaHub.Services.MedicineServ
                 .ToList();
         }
 
-        public async Task<Medication> GetMedicineByIdAsync(int id)
+        public async ValueTask<Medication?> GetMedicineByIdAsync(int id)
         {
-            return await _unitOfWork.Medicines.GetByIdAsync(id);
+            string cacheKey = $"med_full_{id}";
+
+            if (!_cache.TryGetValue(cacheKey, out Medication? medication))
+            {
+                medication = await _unitOfWork.Medicines.GetByIdAsync(id);
+                
+                if (medication != null)
+                {
+                    var cacheOptions = new MemoryCacheEntryOptions()
+                        .SetSlidingExpiration(TimeSpan.FromMinutes(10))
+                        .SetAbsoluteExpiration(TimeSpan.FromHours(1))
+                        .SetSize(1);
+                    
+                    _cache.Set(cacheKey, medication, cacheOptions);
+                }
+            }
+
+            return medication;
         }
 
         public async Task UpdateMedicineAsync(int id, MedicineDto dto, IFormFile? image, int? pharmacyId)
@@ -77,8 +97,9 @@ namespace E_PharmaHub.Services.MedicineServ
             {
                 existingMedicine.ImagePath = await _fileStorage.SaveFileAsync(image, "medicines");
             }
-
+            
             _unitOfWork.Medicines.Update(existingMedicine);
+            _cache.Remove($"med_full_{id}");
 
             if (pharmacyId.HasValue)
             {

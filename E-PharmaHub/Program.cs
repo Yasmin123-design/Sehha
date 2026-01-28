@@ -68,7 +68,7 @@ using E_PharmaHub.Services.BloodRequestServ;
 using E_PharmaHub.Repositories.BloodRequestRepo;
 using E_PharmaHub.Repositories.DonorRepo;
 using E_PharmaHub.Services.DonorServ;
-using E_PharmaHub.Services.ChatBotServ;
+using E_PharmaHub.Middleware;
 
 namespace E_PharmaHub
 {
@@ -79,6 +79,7 @@ namespace E_PharmaHub
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Services.AddSignalR();
+            builder.Services.AddMemoryCache();
 
 
             builder.Services.AddCors(options =>
@@ -178,7 +179,6 @@ namespace E_PharmaHub
                 return new BlobServiceClient(connectionString);
             });
             builder.Services.AddHttpClient();
-            builder.Services.AddScoped<ChatBotService>();
 
             builder.Services.AddScoped<IMedicineRepository, MedicineRepository>();
             builder.Services.AddScoped<IMedicineService, MedicineService>();
@@ -272,6 +272,9 @@ namespace E_PharmaHub
             StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
 
             var app = builder.Build();
+
+            app.UseMiddleware<PerformanceMiddleware>();
+
             app.UseRouting();
 
             // Custom CORS middleware to handle ngrok issues - set headers at the last moment

@@ -39,12 +39,16 @@ namespace E_PharmaHub.Services.OrderServ
 
             var cartItems = await _unitOfWork.CartItemRepository.GetCartItemsWithDetailsByCartIdAsync(cart.Id);
 
+            var medicationIds = cartItems.Select(ci => ci.MedicationId).Distinct().ToList();
+            var allInventories = await _unitOfWork.IinventoryItem.GetInventoriesForCheckoutAsync(medicationIds, dto.PharmacyId);
+
             var itemsForThisPharmacy = new List<dynamic>();
 
             foreach (var cartItem in cartItems)
             {
-                var inventory = await _unitOfWork.IinventoryItem
-                    .GetInventoryForCheckoutAsync(cartItem.MedicationId, dto.PharmacyId, cartItem.UnitPrice);
+                var inventory = allInventories.FirstOrDefault(i => 
+                    i.MedicationId == cartItem.MedicationId && 
+                    i.Price == cartItem.UnitPrice);
 
                 if (inventory != null)
                 {
