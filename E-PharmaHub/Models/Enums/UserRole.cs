@@ -2,11 +2,11 @@
 {
     public enum UserRole
     {
-        RegularUser,
-        Pharmacist,
-        Doctor,
-        BloodRequest,
-        Admin
+        RegularUser = 0,
+        Pharmacist = 1,
+        Doctor = 2,
+        BloodRequest = 3,
+        Admin = 4
     }
 
 }

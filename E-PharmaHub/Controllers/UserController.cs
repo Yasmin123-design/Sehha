@@ -166,6 +166,16 @@ namespace E_PharmaHub.Controllers
                 Path = "/",
                 Expires = DateTimeOffset.UtcNow.AddDays(7)
             });
+
+            Response.Cookies.Append("user_role", user.Role.ToString(), new CookieOptions
+            {
+                HttpOnly = false, // Accessible to frontend
+                Secure = isHttps,
+                SameSite = isHttps ? SameSiteMode.None : SameSiteMode.Lax,
+                Path = "/",
+                Expires = DateTimeOffset.UtcNow.AddDays(7)
+            });
+
             return Ok(new
             {
                 message = "Login successful ✅",
@@ -216,6 +226,15 @@ namespace E_PharmaHub.Controllers
                 Expires = DateTimeOffset.UtcNow.AddDays(7)
             });
 
+            Response.Cookies.Append("user_role", user.Role.ToString(), new CookieOptions
+            {
+                HttpOnly = false,
+                Secure = isHttps,
+                SameSite = isHttps ? SameSiteMode.None : SameSiteMode.Lax,
+                Path = "/",
+                Expires = DateTimeOffset.UtcNow.AddDays(7)
+            });
+
             return Ok();
         }
 
@@ -241,6 +260,7 @@ namespace E_PharmaHub.Controllers
 
             Response.Cookies.Delete("auth_token", cookieOptions);
             Response.Cookies.Delete("refresh_token", cookieOptions);
+            Response.Cookies.Delete("user_role", cookieOptions);
 
             return Ok(new { message = "Logged out successfully ✅" });
         }
