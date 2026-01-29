@@ -147,34 +147,7 @@ namespace E_PharmaHub.Controllers
             var refreshToken = GenerateRefreshToken();
             await _userService.SaveRefreshTokenAsync(user.Id, refreshToken);
 
-            var isHttps = Request.IsHttps;
-
-            Response.Cookies.Append("auth_token", token, new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = isHttps,
-                SameSite = isHttps ? SameSiteMode.None : SameSiteMode.Lax,
-                Path = "/",
-                Expires = DateTimeOffset.UtcNow.AddMinutes(30)
-            });
-
-            Response.Cookies.Append("refresh_token", refreshToken, new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = isHttps,
-                SameSite = isHttps ? SameSiteMode.None : SameSiteMode.Lax,
-                Path = "/",
-                Expires = DateTimeOffset.UtcNow.AddDays(7)
-            });
-
-            Response.Cookies.Append("user_role", user.Role.ToString(), new CookieOptions
-            {
-                HttpOnly = false, // Accessible to frontend
-                Secure = isHttps,
-                SameSite = isHttps ? SameSiteMode.None : SameSiteMode.Lax,
-                Path = "/",
-                Expires = DateTimeOffset.UtcNow.AddDays(7)
-            });
+            SetAuthCookies(token, refreshToken, user.Role.ToString());
 
             return Ok(new
             {
@@ -207,33 +180,7 @@ namespace E_PharmaHub.Controllers
 
             await _userService.SaveRefreshTokenAsync(user.Id, newRefreshToken);
 
-            var isHttps = Request.IsHttps;
-
-            Response.Cookies.Append("auth_token", newAccessToken, new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = isHttps,
-                SameSite = isHttps ? SameSiteMode.None : SameSiteMode.Lax,
-                Path = "/",
-                Expires = DateTimeOffset.UtcNow.AddMinutes(30)
-            });
-            Response.Cookies.Append("refresh_token", newRefreshToken, new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = isHttps,
-                SameSite = isHttps ? SameSiteMode.None : SameSiteMode.Lax,
-                Path = "/",
-                Expires = DateTimeOffset.UtcNow.AddDays(7)
-            });
-
-            Response.Cookies.Append("user_role", user.Role.ToString(), new CookieOptions
-            {
-                HttpOnly = false,
-                Secure = isHttps,
-                SameSite = isHttps ? SameSiteMode.None : SameSiteMode.Lax,
-                Path = "/",
-                Expires = DateTimeOffset.UtcNow.AddDays(7)
-            });
+            SetAuthCookies(newAccessToken, newRefreshToken, user.Role.ToString());
 
             return Ok();
         }
@@ -325,6 +272,43 @@ namespace E_PharmaHub.Controllers
             return Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
         }
 
+        private void SetAuthCookies(string token, string refreshToken, string role)
+        {
+            var isHttps = Request.IsHttps;
+            var sameSite = isHttps ? SameSiteMode.None : SameSiteMode.Lax;
+
+            var authCookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = isHttps,
+                SameSite = sameSite,
+                Path = "/",
+                Expires = DateTimeOffset.UtcNow.AddMinutes(30)
+            };
+
+            Response.Cookies.Append("auth_token", token, authCookieOptions);
+
+            var refreshCookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = isHttps,
+                SameSite = sameSite,
+                Path = "/",
+                Expires = DateTimeOffset.UtcNow.AddDays(7)
+            };
+            Response.Cookies.Append("refresh_token", refreshToken, refreshCookieOptions);
+
+            var roleCookieOptions = new CookieOptions
+            {
+                HttpOnly = false,
+                Secure = isHttps,
+                SameSite = sameSite,
+                Path = "/",
+                Expires = DateTimeOffset.UtcNow.AddDays(7)
+            };
+            Response.Cookies.Append("user_role", role, roleCookieOptions);
+        }
+
         [HttpGet("google-login")]
         public IActionResult GoogleLogin()
         {
@@ -353,10 +337,15 @@ namespace E_PharmaHub.Controllers
                     Role = UserRole.RegularUser
                 };
                 await _userManager.CreateAsync(user);
+                await _userManager.AddToRoleAsync(user, user.Role.ToString());
             }
 
             var roles = await _userManager.GetRolesAsync(user);
             var token = GenerateJwtToken(user, roles);
+            var refreshToken = GenerateRefreshToken();
+            await _userService.SaveRefreshTokenAsync(user.Id, refreshToken);
+
+            SetAuthCookies(token, refreshToken, user.Role.ToString());
 
             var userObj = new
             {
@@ -371,7 +360,7 @@ namespace E_PharmaHub.Controllers
             var frontendUrl = _config["Frontend:BaseUrl"];
 
             return Redirect(
-                $"{frontendUrl}/auth/callback?token={token}&user={encodedUser}");
+                $"{frontendUrl}/auth/callback?user={encodedUser}");
         }
 
 
@@ -406,10 +395,15 @@ namespace E_PharmaHub.Controllers
                     Role = UserRole.RegularUser
                 };
                 await _userManager.CreateAsync(user);
+                await _userManager.AddToRoleAsync(user, user.Role.ToString());
             }
 
             var roles = await _userManager.GetRolesAsync(user);
             var token = GenerateJwtToken(user, roles);
+            var refreshToken = GenerateRefreshToken();
+            await _userService.SaveRefreshTokenAsync(user.Id, refreshToken);
+
+            SetAuthCookies(token, refreshToken, user.Role.ToString());
 
             var userObj = new
             {
@@ -424,7 +418,7 @@ namespace E_PharmaHub.Controllers
             var frontendUrl = _config["Frontend:BaseUrl"];
 
             return Redirect(
-                $"{frontendUrl}/auth/callback?token={token}&user={encodedUser}");
+                $"{frontendUrl}/auth/callback?user={encodedUser}");
         }
 
         [HttpGet("profile")]
