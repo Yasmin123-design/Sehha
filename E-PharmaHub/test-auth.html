@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auth Test - E-PharmaHub</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 40px; line-height: 1.6; background: #f0f2f5; color: #1c1e21; }
+        .container { max-width: 700px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        h2 { color: #1a73e8; margin-top: 0; border-bottom: 2px solid #e8f0fe; padding-bottom: 15px; }
+        .section { margin-bottom: 25px; padding: 15px; border: 1px solid #e4e6eb; border-radius: 8px; }
+        h3 { margin-top: 0; font-size: 1.1em; color: #4b4f56; }
+        button { 
+            padding: 12px 24px; margin: 8px 4px; cursor: pointer; border: none; border-radius: 6px; 
+            font-weight: 600; font-size: 14px; transition: all 0.2s;
+        }
+        .btn-google { background: #ea4335; color: white; }
+        .btn-facebook { background: #1877f2; color: white; }
+        .btn-profile { background: #34a853; color: white; }
+        .btn-logout { background: #5f6368; color: white; }
+        button:hover { filter: brightness(0.9); transform: translateY(-1px); }
+        button:active { transform: translateY(0); }
+        pre { 
+            background: #282c34; color: #abb2bf; padding: 20px; border-radius: 8px; 
+            overflow-x: auto; font-family: 'Consolas', monospace; font-size: 13px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status-bar { 
+            background: #e8f0fe; color: #1967d2; padding: 10px 15px; 
+            border-radius: 6px; margin-bottom: 20px; font-weight: 500;
+            display: flex; align-items: center;
+        }
+        .status-dot { width: 10px; height: 10px; border-radius: 50%; background: #34a853; margin-right: 10px; }
+        hr { border: 0; border-top: 1px solid #e4e6eb; margin: 20px 0; }
+        .note { font-size: 0.85em; color: #70757a; margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>🔐 E-PharmaHub Auth Tester</h2>
+    
+    <div class="status-bar">
+        <div class="status-dot"></div>
+        <span id="status">Status: System Ready</span>
+    </div>
+
+    <div class="section">
+        <h3>1. Social Login Authentication</h3>
+        <p class="note">This will redirect you to the social provider and back to the landing page.</p>
+        <button class="btn-google" onclick="login('google')">Login with Google</button>
+        <button class="btn-facebook" onclick="login('facebook')">Login with Facebook</button>
+    </div>
+
+    <div class="section">
+        <h3>2. Authenticated API Test</h3>
+        <p class="note">Uses <code>withCredentials: true</code> to automatically include HttpOnly cookies.</p>
+        <button class="btn-profile" onclick="getProfile()">Fetch Profile (Get API)</button>
+        <button class="btn-logout" onclick="logout()">Logout (Clear Server Sessions)</button>
+    </div>
+
+    <div>
+        <h3>Server Response:</h3>
+        <pre id="result">// Activity log will appear here...</pre>
+    </div>
+</div>
+
+<script>
+    // Configuration - Points to your Azure Server
+    const API_BASE_URL = "https://webadd-avgnfdemdqcffecu.canadacentral-01.azurewebsites.net"; 
+    
+    // Axios global setup
+    const api = axios.create({
+        baseURL: API_BASE_URL,
+        withCredentials: true // MANDATORY for HttpOnly cookies
+    });
+
+    // Check for user object in URL query (delivered after redirect)
+    window.onload = () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const userJson = urlParams.get('user');
+        if (userJson) {
+            try {
+                const userData = JSON.parse(decodeURIComponent(userJson));
+                updateStatus("Logged in via Social Redirect!");
+                logData("User Metadata Received:\n" + JSON.stringify(userData, null, 2));
+                console.log("Cookies should now be present in your browser.");
+            } catch (e) {
+                logData("Error parsing user data from URL.");
+            }
+        }
+    };
+
+    function login(provider) {
+        updateStatus(`Redirecting to ${provider}...`);
+        // We navigate away to start the OAuth flow
+        window.location.href = `${API_BASE_URL}/api/user/${provider}-login`;
+    }
+
+    async function getProfile() {
+        updateStatus("Requesting Profile...");
+        try {
+            const response = await api.get('/api/user/profile');
+            logData("Success! Profile Data:\n" + JSON.stringify(response.data, null, 2));
+            updateStatus("Authentication Verified!");
+        } catch (error) {
+            console.error("Auth Error:", error);
+            const msg = error.response?.data?.message || error.message;
+            logData("Authentication Failed: " + msg + "\n\nTip: Make sure you are logged in and the API domain is allowed in CORS.");
+            updateStatus("Unauthorized / Error");
+        }
+    }
+
+    async function logout() {
+        updateStatus("Logging out...");
+        try {
+            await api.post('/api/user/logout');
+            logData("Logged out. Server-side tokens revoked. Cookies will be cleared on next request or expired.");
+            updateStatus("System Reset");
+        } catch (error) {
+            logData("Logout request failed.");
+        }
+    }
+
+    function updateStatus(text) {
+        document.getElementById('status').innerText = "Status: " + text;
+    }
+
+    function logData(text) {
+        document.getElementById('result').innerText = text;
+    }
+</script>
+
+</body>
+</html>

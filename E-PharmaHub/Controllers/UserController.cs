@@ -359,8 +359,12 @@ namespace E_PharmaHub.Controllers
 
             var frontendUrl = _config["Frontend:BaseUrl"];
 
-            return Redirect(
-                $"{frontendUrl}/auth/callback?user={encodedUser}");
+            //return Redirect(
+            //    $"{frontendUrl}/auth/callback?user={encodedUser}");
+            return Content(
+                $"<h1>Login Success!</h1>" +
+                $"<p>User: {user.Email}</p>" +
+                $"<p>Cookies are set. Now visit: <a href='/api/user/profile'>View Profile</a></p>", "text/html");
         }
 
 
