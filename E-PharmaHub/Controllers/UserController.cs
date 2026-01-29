@@ -385,10 +385,16 @@ namespace E_PharmaHub.Controllers
         [HttpGet("facebook-response")]
         public async Task<IActionResult> FacebookResponse()
         {
-            var result = await HttpContext.AuthenticateAsync(IdentityConstants.ExternalScheme);
-            if (!result.Succeeded) return BadRequest("Facebook login failed");
+            var result = await HttpContext.AuthenticateAsync(
+                IdentityConstants.ExternalScheme);
+
+            if (!result.Succeeded)
+                return Redirect($"{_config["Frontend:BaseUrl"]}/login?error=facebook");
 
             var email = result.Principal.FindFirst(ClaimTypes.Email)?.Value;
+            if (email == null)
+                return Redirect($"{_config["Frontend:BaseUrl"]}/login?error=no-email");
+
             var user = await _userManager.FindByEmailAsync(email);
 
             if (user == null)
@@ -405,7 +411,20 @@ namespace E_PharmaHub.Controllers
             var roles = await _userManager.GetRolesAsync(user);
             var token = GenerateJwtToken(user, roles);
 
-            return Ok(new { token, user = new { user.UserName, user.Email, Roles = roles } });
+            var userObj = new
+            {
+                user.UserName,
+                user.Email,
+                Roles = roles
+            };
+
+            var encodedUser = Uri.EscapeDataString(
+                System.Text.Json.JsonSerializer.Serialize(userObj));
+
+            var frontendUrl = _config["Frontend:BaseUrl"];
+
+            return Redirect(
+                $"{frontendUrl}/auth/callback?token={token}&user={encodedUser}");
         }
 
         [HttpGet("profile")]
