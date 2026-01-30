@@ -221,7 +221,7 @@ namespace E_PharmaHub.Controllers
 
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 
-            var resetLink = $"{_config["Jwt:Audience"]}/reset-password?email={user.Email}&token={Uri.EscapeDataString(token)}";
+            var resetLink = $"{_config["Frontend:BaseUrl"]}/reset-password?email={user.Email}&token={Uri.EscapeDataString(token)}";
 
             await _emailSender.SendEmailAsync(user.Email, "Reset Your Password",
                 $"<p>Click the link below to reset your password:</p><a href='{resetLink}'>Reset Password</a>");
@@ -359,12 +359,12 @@ namespace E_PharmaHub.Controllers
 
             var frontendUrl = _config["Frontend:BaseUrl"];
 
-            //return Redirect(
-            //    $"{frontendUrl}/auth/callback?user={encodedUser}");
-            return Content(
-                $"<h1>Login Success!</h1>" +
-                $"<p>User: {user.Email}</p>" +
-                $"<p>Cookies are set. Now visit: <a href='/api/user/profile'>View Profile</a></p>", "text/html");
+            return Redirect(
+                $"{frontendUrl}/auth/callback?user={encodedUser}");
+            //return Content(
+            //    $"<h1>Login Success!</h1>" +
+            //    $"<p>User: {user.Email}</p>" +
+            //    $"<p>Cookies are set. Now visit: <a href='/api/user/profile'>View Profile</a></p>", "text/html");
         }
 
 

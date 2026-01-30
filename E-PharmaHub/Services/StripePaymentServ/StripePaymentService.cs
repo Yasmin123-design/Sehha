@@ -104,8 +104,8 @@ namespace E_PharmaHub.Services.StripePaymentServ
             }
                 },
 
-                SuccessUrl = _config["Stripe:SuccessUrl"],
-                CancelUrl = _config["Stripe:CancelUrl"],
+                SuccessUrl = _config["Frontend:BaseUrl"] + "/payment-success?session_id={CHECKOUT_SESSION_ID}",
+                CancelUrl = _config["Frontend:BaseUrl"] + "/payment-cancel",
             };
 
             var service = new SessionService();
