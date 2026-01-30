@@ -67,7 +67,7 @@ namespace E_PharmaHub.Repositories.AppointmentRepo
         public async Task<List<Appointment>> GetPatientsOfDoctorAsync(string doctorId)
         {
             return await BaseAppointmentIncludes()
-                .Where(a => a.DoctorId == doctorId)
+                .Where(a => a.DoctorId == doctorId && a.Status == AppointmentStatus.Confirmed)
                 .ToListAsync();
         }
         public async Task<Appointment> GetAppointmentByPaymentIdAsync(int paymentId)

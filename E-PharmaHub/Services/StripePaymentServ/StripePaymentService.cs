@@ -104,8 +104,8 @@ namespace E_PharmaHub.Services.StripePaymentServ
             }
                 },
 
-                SuccessUrl = "http://localhost:3000/payment-success?session_id={CHECKOUT_SESSION_ID}",
-                CancelUrl = "http://localhost:3000/payment-cancel",
+                SuccessUrl = _config["Stripe:SuccessUrl"],
+                CancelUrl = _config["Stripe:CancelUrl"],
             };
 
             var service = new SessionService();

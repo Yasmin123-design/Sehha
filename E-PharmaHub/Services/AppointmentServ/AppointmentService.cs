@@ -71,7 +71,6 @@ namespace E_PharmaHub.Services.AppointmentServ
             return response;
         }
 
-
         public async Task<IEnumerable<AppointmentResponseDto>> GetAppointmentsByDoctorAsync(string doctorId)
         {
             var appointments = await _unitOfWork.Appointments.GetAppointmentsByDoctorIdAsync(doctorId);
