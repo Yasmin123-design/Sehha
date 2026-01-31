@@ -69,6 +69,7 @@ using E_PharmaHub.Repositories.BloodRequestRepo;
 using E_PharmaHub.Repositories.DonorRepo;
 using E_PharmaHub.Services.DonorServ;
 using E_PharmaHub.Middleware;
+using Microsoft.AspNetCore.HttpOverrides;
 
 namespace E_PharmaHub
 {
@@ -101,6 +102,32 @@ namespace E_PharmaHub
                 });
             });
 
+
+            builder.Services.Configure<ForwardedHeadersOptions>(options =>
+            {
+                options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+                options.KnownNetworks.Clear();
+                options.KnownProxies.Clear();
+            });
+
+            builder.Services.Configure<CookiePolicyOptions>(options =>
+            {
+                options.MinimumSameSitePolicy = SameSiteMode.Unspecified;
+                options.OnAppendCookie = cookieContext =>
+                {
+                    if (cookieContext.CookieOptions.SameSite == SameSiteMode.None)
+                    {
+                        cookieContext.CookieOptions.Secure = true;
+                    }
+                };
+                options.OnDeleteCookie = cookieContext =>
+                {
+                    if (cookieContext.CookieOptions.SameSite == SameSiteMode.None)
+                    {
+                        cookieContext.CookieOptions.Secure = true;
+                    }
+                };
+            });
 
             builder.Services.AddControllers()
                 .AddJsonOptions(options =>
@@ -329,6 +356,8 @@ namespace E_PharmaHub
             //    await next();
             //});
 
+            app.UseForwardedHeaders();
+            app.UseCookiePolicy();
             app.UseCors("AllowAll");
 
 
