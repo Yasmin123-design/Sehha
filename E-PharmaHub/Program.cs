@@ -192,12 +192,31 @@ namespace E_PharmaHub
                 options.ClientId = builder.Configuration["AuthenticationGoogle:Google:ClientId"];
                 options.ClientSecret = builder.Configuration["AuthenticationGoogle:Google:ClientSecret"];
                 options.CallbackPath = "/signin-google";
+                
+                // Essential for production (Azure/Vercel)
+                options.CorrelationCookie.SameSite = SameSiteMode.None;
+                options.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
+                options.CorrelationCookie.HttpOnly = true;
             })
             .AddFacebook(options =>
             {
                 options.AppId = builder.Configuration["AuthenticationFacebook:Facebook:AppId"];
                 options.AppSecret = builder.Configuration["AuthenticationFacebook:Facebook:AppSecret"];
                 options.CallbackPath = "/signin-facebook";
+                
+                // Essential for production (Azure/Vercel)
+                options.CorrelationCookie.SameSite = SameSiteMode.None;
+                options.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
+                options.CorrelationCookie.HttpOnly = true;
+            });
+
+            // Configure the external cookie used by Identity
+            builder.Services.ConfigureExternalCookie(options =>
+            {
+                options.Cookie.SameSite = SameSiteMode.None;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                options.Cookie.HttpOnly = true;
+                options.Cookie.Name = "EPharma.External";
             });
 
 
@@ -355,11 +374,16 @@ namespace E_PharmaHub
 
             //    await next();
             //});
-
+            
             app.UseForwardedHeaders();
-            app.UseCookiePolicy();
-            app.UseCors("AllowAll");
 
+            app.UseStaticFiles();
+
+            app.UseCookiePolicy();
+
+            app.UseRouting();
+
+            app.UseCors("AllowAll");
 
             using (var scope = app.Services.CreateScope())
             {
@@ -373,7 +397,6 @@ namespace E_PharmaHub
                     }
                 }
             }
-
 
             if (app.Environment.IsDevelopment())
             {

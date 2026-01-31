@@ -238,7 +238,26 @@ namespace E_PharmaHub.Controllers
             var result = await _userManager.ResetPasswordAsync(user, model.Token, model.NewPassword);
             if (!result.Succeeded) return BadRequest(result.Errors);
 
-            return Ok(new { message = "Password has been reset successfully!" });
+            // Automatically log the user in after password reset
+            var roles = await _userManager.GetRolesAsync(user);
+            var token = GenerateJwtToken(user, roles);
+            var refreshToken = GenerateRefreshToken();
+            await _userService.SaveRefreshTokenAsync(user.Id, refreshToken);
+
+            SetAuthCookies(token, refreshToken, roles.FirstOrDefault() ?? "User");
+
+            var userObj = new
+            {
+                user.UserName,
+                user.Email,
+                Roles = roles
+            };
+
+            return Ok(new 
+            { 
+                message = "Password has been reset successfully and you are now logged in!",
+                user = userObj
+            });
         }
         private string GenerateJwtToken(AppUser user, IList<string> roles)
         {
