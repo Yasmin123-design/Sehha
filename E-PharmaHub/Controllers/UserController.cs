@@ -226,7 +226,7 @@ namespace E_PharmaHub.Controllers
             await _emailSender.SendEmailAsync(user.Email, "Reset Your Password",
                 $"<p>Click the link below to reset your password:</p><a href='{resetLink}'>Reset Password</a>");
 
-            return Ok(new { message = "Password reset link has been sent to your email.",token });
+            return Ok(new { message = "Password reset link has been sent to your email." });
         }
 
         [HttpPost("reset-password")]
