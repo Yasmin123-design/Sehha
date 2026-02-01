@@ -126,7 +126,7 @@ namespace E_PharmaHub.Repositories.DoctorRepo
                 query = query.Where(d => d.Specialty == specialty);
 
             if (!string.IsNullOrEmpty(name))
-                query = query.Where(d => d.AppUser.UserName.Contains(name));
+                query = query.Where(d => d.AppUser.UserName.StartsWith(name));
 
             if (gender.HasValue)
                 query = query.Where(d => d.Gender == gender);

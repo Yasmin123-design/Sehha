@@ -66,7 +66,7 @@ namespace E_PharmaHub.Repositories.MedicineRepo
         public async Task<IEnumerable<MedicineDto>> SearchByNameAsync(string name)
         {
             var meds = await BaseMedicationIncludes()
-                .Where(m => m.BrandName.Contains(name) || m.GenericName.Contains(name))
+                .Where(m => m.BrandName.StartsWith(name) || m.GenericName.StartsWith(name))
                 .ToListAsync();
 
             var dtos = meds
@@ -120,7 +120,7 @@ namespace E_PharmaHub.Repositories.MedicineRepo
             var query = BaseMedicationIncludes();
 
             if (name != null)
-                query = query.Where(m => m.BrandName.Contains(name) || m.GenericName.Contains(name));
+                query = query.Where(m => m.BrandName.StartsWith(name) || m.GenericName.StartsWith(name));
 
             if (dosageForm.HasValue)
                 query = query.Where(m => m.DosageFormType == dosageForm);
