@@ -261,7 +261,7 @@ namespace E_PharmaHub.Controllers
                 issuer: _config["Jwt:Issuer"],
                 audience: _config["Jwt:Audience"],
                 claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(30),
+                expires: DateTime.UtcNow.AddDays(1),
                 signingCredentials: creds
             );
 
@@ -283,7 +283,7 @@ namespace E_PharmaHub.Controllers
                 Secure = isHttps,
                 SameSite = sameSite,
                 Path = "/",
-                Expires = DateTimeOffset.UtcNow.AddMinutes(30)
+                Expires = DateTimeOffset.UtcNow.AddDays(1)
             };
 
             Response.Cookies.Append("auth_token", token, authCookieOptions);
@@ -294,7 +294,7 @@ namespace E_PharmaHub.Controllers
                 Secure = isHttps,
                 SameSite = sameSite,
                 Path = "/",
-                Expires = DateTimeOffset.UtcNow.AddDays(7)
+                Expires = DateTimeOffset.UtcNow.AddDays(1)
             };
             Response.Cookies.Append("refresh_token", refreshToken, refreshCookieOptions);
 
