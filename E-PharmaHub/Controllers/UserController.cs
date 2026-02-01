@@ -360,7 +360,7 @@ namespace E_PharmaHub.Controllers
             var frontendUrl = _config["Frontend:BaseUrl"];
             //http://127.0.0.1:5500/welcome.html
             return Redirect(
-                "http://127.0.0.1:5500/welcome.html");
+                "http://127.0.0.1:5501/welcome.html");
             //return Redirect(
             //    $"{frontendUrl}/auth/callback?user={encodedUser}");
             //return Content(
