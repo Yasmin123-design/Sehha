@@ -226,7 +226,7 @@ namespace E_PharmaHub.Controllers
             await _emailSender.SendEmailAsync(user.Email, "Reset Your Password",
                 $"<p>Click the link below to reset your password:</p><a href='{resetLink}'>Reset Password</a>");
 
-            return Ok(new { message = "Password reset link has been sent to your email." });
+            return Ok(new { message = "Password reset link has been sent to your email.", token = token });
         }
 
         [HttpPost("reset-password")]
@@ -358,9 +358,11 @@ namespace E_PharmaHub.Controllers
                 System.Text.Json.JsonSerializer.Serialize(userObj));
 
             var frontendUrl = _config["Frontend:BaseUrl"];
-
+            //http://127.0.0.1:5500/welcome.html
             return Redirect(
-                $"{frontendUrl}/auth/callback?user={encodedUser}");
+                "http://127.0.0.1:5500/welcome.html");
+            //return Redirect(
+            //    $"{frontendUrl}/auth/callback?user={encodedUser}");
             //return Content(
             //    $"<h1>Login Success!</h1>" +
             //    $"<p>User: {user.Email}</p>" +
